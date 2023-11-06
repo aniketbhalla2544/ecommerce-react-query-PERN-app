@@ -4,6 +4,29 @@ import { z } from 'zod';
 import createHttpError from 'http-errors';
 import { getOffset } from 'api/db/queryHelpers';
 
+async function getProduct(req: Request, res: Response) {
+  const userId = USER_ID;
+  const productId = Number(req.params.id.trim());
+
+  const getProductQueryResult = await pgquery({
+    text: `SELECT product_id, user_id, title, price, description, image FROM products 
+          WHERE user_id = $1 AND is_archived = false AND product_id = $2`,
+    values: [userId, productId],
+  });
+  const { rowCount, rows } = getProductQueryResult;
+
+  if (!rowCount) {
+    throw createHttpError(404, 'Product not found', {
+      productId,
+    });
+  }
+
+  return res.json({
+    success: true,
+    data: rows[0],
+  });
+}
+
 async function getProducts(req: Request, res: Response) {
   const userId = USER_ID;
 
@@ -129,6 +152,7 @@ async function updateProduct(req: Request, res: Response) {
 
 export const productControllersV1 = {
   getProducts,
+  getProduct,
   createProduct,
   deleteProduct,
   updateProduct,

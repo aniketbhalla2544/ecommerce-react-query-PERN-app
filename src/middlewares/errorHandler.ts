@@ -1,13 +1,14 @@
+// import { apploggers } from 'services/logger.services';
 import { isHttpError } from 'http-errors';
 import { Request, Response, NextFunction } from 'express';
-import { apploggers } from '@/services/logger.services';
+import { ZodError } from 'zod';
 
 const DEFAULT_ERROR_NAME = 'Internal Server Error';
 export const INVALID_ROUTE_MSG = 'Request to invalid route';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunction) => {
-  // errors created with 'http-errors' package
+  // ✔️ catching 'http-errors' package generated errors
   if (isHttpError(err)) {
     const exposedToClient = err.expose;
     if (exposedToClient) {
@@ -15,35 +16,59 @@ const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunct
       const msg = err.message;
       const name = err.name ?? DEFAULT_ERROR_NAME;
       const httpError = {
+        status,
         success: false,
         name,
         msg,
       };
-      apploggers.jsonLogger.error(httpError);
+      console.log(httpError);
+      // apploggers.jsonLogger.error(httpError);
       return res.status(status).json(httpError);
     }
   }
 
-  // for invalid route request
+  // ✔️ catching zod validation errors
+  if (err instanceof ZodError) {
+    const issues = err.issues;
+    const validationErrorMessages = [];
+    for (const issue of issues) {
+      validationErrorMessages.push(issue.message);
+    }
+    const errorResponse = {
+      status: 400,
+      success: false,
+      name: 'Validation Error',
+      validationErrorMessages,
+    };
+    console.log(errorResponse);
+    return res.status(400).json(errorResponse);
+  }
+
+  // ✔️ catching invalid route request error
   if (err instanceof Error) {
     if (err.message === INVALID_ROUTE_MSG) {
       const invalidRouteRequestError = {
+        status: 400,
         name: DEFAULT_ERROR_NAME,
         msg: INVALID_ROUTE_MSG,
         requestedPath: req.originalUrl,
       };
-      apploggers.jsonLogger.error(invalidRouteRequestError);
-      return res.status(404).json(invalidRouteRequestError);
+      console.log(invalidRouteRequestError);
+      // apploggers.jsonLogger.error(invalidRouteRequestError);
+      return res.status(400).json(invalidRouteRequestError);
     }
   }
 
-  // general error
+  // ✔️ catching general errors
+  const generalErrorMsg = err instanceof Error ? err.message : 'Something went wrong';
   const error = {
     success: false,
+    status: 500,
     name: DEFAULT_ERROR_NAME,
-    msg: 'Something went wrong',
+    msg: generalErrorMsg,
   };
-  apploggers.jsonLogger.error(error);
+  console.log(error);
+  // apploggers.jsonLogger.error(error);
   return res.status(500).json(error);
 };
 

@@ -1,0 +1,23 @@
+# project
+node_modules
+npm-debug.log
+build
+dist
+
+# IDEs
+.vscode
+
+# Documentation
+README.md
+SECURITY.md
+CHANGELOG.md
+CODE_OF_CONDUCT.md
+
+# github
+.git
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml

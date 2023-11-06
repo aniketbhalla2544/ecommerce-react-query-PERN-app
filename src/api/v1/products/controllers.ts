@@ -1,29 +1,147 @@
-import axios from 'axios';
-import validator from 'validator';
-import createHttpError from 'http-errors';
 import { Request, Response } from 'express';
-
-const API_URL = 'https://fakestoreapi.com';
+import { USER_ID, pgquery } from 'db';
+import { z } from 'zod';
+import createHttpError from 'http-errors';
+import { getOffset } from 'api/db/queryHelpers';
 
 async function getProducts(req: Request, res: Response) {
-  const limitParam = req.query.limit;
-  const limit = typeof limitParam === 'string' && limitParam.trim();
+  const userId = USER_ID;
 
-  // ✅ validating query string param "limit" type
-  if (limit) {
-    const isLimitValid = validator.isInt(limit, {
-      min: 1,
-    });
-    // console.log('isLimitValid: ', isLimitValid);
-    if (!isLimitValid) {
-      throw createHttpError(400, 'Invalid type of query param limit', {});
-    }
+  // ✔️ page, limit, offset
+  const DEFAULT_PAGE = 1;
+  const DEFAULT_LIMIT = 10;
+  const currentPage: number = Math.abs(Number(req.query.page)) || DEFAULT_PAGE;
+  const limit: number = Number(req.query.limit) || DEFAULT_LIMIT;
+  const offset = getOffset(currentPage, limit);
+
+  // selects undeleted products for user_id = 1 sorted by created_at in descending order
+  const sortedProductsQuery = pgquery({
+    text: `SELECT product_id, user_id, title, price, description, image FROM products 
+          WHERE user_id = $1 AND is_archived = false
+          ORDER BY created_at DESC
+          LIMIT $2 OFFSET $3`,
+    values: [userId, limit, offset],
+  });
+
+  // calculates total product pages with given limit and conditionally fetched products
+  const totalProductPagesQuery = pgquery({
+    text: `SELECT CEIL(COUNT(*)::DECIMAL/$1::DECIMAL) AS total_pages 
+          FROM (
+                SELECT product_id FROM products
+                WHERE user_id = $2 AND is_archived = false
+                ) AS products;`,
+    values: [limit, userId],
+  });
+  const responses = await Promise.all([sortedProductsQuery, totalProductPagesQuery]);
+  const [sortedProductsQueryResponse, totalProductPagesQueryResponse] = responses;
+  const { rows: data, rowCount: productsCount } = sortedProductsQueryResponse;
+  const totalProductPages =
+    Math.abs(Number(totalProductPagesQueryResponse.rows[0]['total_pages'])) || 0;
+
+  return res.json({
+    success: !!(totalProductPages && productsCount),
+    meta: {
+      productsCount,
+      offset,
+      currentPage,
+      limit,
+      totalProductPages,
+    },
+    data,
+  });
+}
+
+async function createProduct(req: Request, res: Response) {
+  const userId = USER_ID;
+  const newProduct = req.body;
+
+  // ✅ product type validation
+  const ProductSchema = z.object({
+    title: z.string().trim().min(2).max(120),
+    description: z.string().trim().min(10),
+    price: z.number().min(1).optional().default(1),
+    image: z.string().trim().url().nullable().optional(),
+  });
+  const validatedNewProduct = ProductSchema.parse(newProduct);
+
+  const response = await pgquery({
+    text: 'INSERT INTO products (user_id, title, price, description, image) VALUES ($1, $2, $3, $4, $5) RETURNING title, price, description, image',
+    values: [
+      userId,
+      validatedNewProduct.title,
+      validatedNewProduct.price,
+      validatedNewProduct.description,
+      validatedNewProduct.image,
+    ],
+  });
+  return res.json({
+    success: true,
+    msg: 'Product successfully created',
+    createdProduct: response.rows[0],
+  });
+}
+
+async function deleteProduct(req: Request, res: Response) {
+  const userId = USER_ID;
+  const productId = Number(req.params.id.trim());
+
+  const result = await pgquery({
+    text: 'UPDATE products SET is_archived = true WHERE product_id = $1 AND is_archived = FALSE AND user_id = $2',
+    values: [productId, userId],
+  });
+  const { rowCount: totalDeletedRows } = result;
+
+  if (!totalDeletedRows) {
+    throw createHttpError(
+      404,
+      `Operation failed as product with id = ${productId} not found`
+    );
   }
 
-  const { data } = await axios(`${API_URL}/products?limit=${limit}`);
-  return res.json(data);
+  return res.json({
+    success: !!totalDeletedRows,
+    msg: `product with id = ${productId} successfully deleted`,
+  });
+}
+
+async function updateProduct(req: Request, res: Response) {
+  const productId = Number(req.params.id.trim());
+
+  const response = await pgquery({
+    text: 'UPDATE products SET price = $1 WHERE product_id = $2',
+    values: [undefined, productId],
+  });
+  // const totalDeletedRows = response.rowCount;
+
+  // if (!totalDeletedRows) {
+  //   throw createHttpError(
+  //     404,
+  //     `Operation failed as product with id = ${productId} not found`
+  //   );
+  // }
+
+  return res.json({
+    // success: !!totalDeletedRows,
+    response,
+    msg: `product with id = ${productId} successfully deleted`,
+  });
 }
 
 export const productControllersV1 = {
   getProducts,
+  createProduct,
+  deleteProduct,
+  updateProduct,
 };
+
+// ✅ validating req.query.limit (FOR GET PRODUCTS)
+// const DEFAULT_TOTAL_PRODUCTS = 10;
+// const LimitValidationSchema = z
+//   .number()
+//   .min(1)
+//   .optional()
+//   .default(DEFAULT_TOTAL_PRODUCTS);
+// const queryLimit = isNaN(Number(req.query?.limit))
+//   ? DEFAULT_TOTAL_PRODUCTS
+//   : Number(req.query.limit);
+// const validatedLimitQueryParam = LimitValidationSchema.parse(queryLimit);

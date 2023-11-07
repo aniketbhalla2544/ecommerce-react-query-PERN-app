@@ -22,7 +22,7 @@ async function getProduct(req: Request, res: Response) {
   }
 
   return res.json({
-    success: true,
+    success: !!rowCount,
     data: rows[0],
   });
 }
@@ -42,7 +42,7 @@ async function getProducts(req: Request, res: Response) {
     text: `SELECT product_id, user_id, title, price, description, image FROM products 
           WHERE user_id = $1 AND is_archived = false
           ORDER BY created_at DESC
-          LIMIT $2 OFFSET $3`,
+          LIMIT $2 OFFSET $3;`,
     values: [userId, limit, offset],
   });
 
@@ -88,7 +88,9 @@ async function createProduct(req: Request, res: Response) {
   const validatedNewProduct = ProductSchema.parse(newProduct);
 
   const response = await pgquery({
-    text: 'INSERT INTO products (user_id, title, price, description, image) VALUES ($1, $2, $3, $4, $5) RETURNING title, price, description, image',
+    text: `INSERT INTO products (user_id, title, price, description, image) 
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING title, price, description, image`,
     values: [
       userId,
       validatedNewProduct.title,
@@ -109,7 +111,9 @@ async function deleteProduct(req: Request, res: Response) {
   const productId = Number(req.params.id.trim());
 
   const result = await pgquery({
-    text: 'UPDATE products SET is_archived = true WHERE product_id = $1 AND is_archived = FALSE AND user_id = $2',
+    text: `UPDATE products 
+    SET is_archived = true
+    WHERE product_id = $1 AND is_archived = FALSE AND user_id = $2`,
     values: [productId, userId],
   });
   const { rowCount: totalDeletedRows } = result;
@@ -128,25 +132,38 @@ async function deleteProduct(req: Request, res: Response) {
 }
 
 async function updateProduct(req: Request, res: Response) {
+  const userId = USER_ID;
   const productId = Number(req.params.id.trim());
 
-  const response = await pgquery({
-    text: 'UPDATE products SET price = $1 WHERE product_id = $2',
-    values: [undefined, productId],
+  // validate the req body
+  const ProductSchema = z.object({
+    title: z.string().trim().min(2).max(120),
+    description: z.string().trim().min(10),
+    price: z.number().min(1),
+    image: z.string().trim().url().nullable(),
   });
-  // const totalDeletedRows = response.rowCount;
+  const validtedUpdatedProduct = ProductSchema.parse(req.body);
+  const { image, price, title, description } = validtedUpdatedProduct;
 
-  // if (!totalDeletedRows) {
-  //   throw createHttpError(
-  //     404,
-  //     `Operation failed as product with id = ${productId} not found`
-  //   );
-  // }
+  const updateQueryResponse = await pgquery({
+    text: `UPDATE products 
+    SET image = $1, price = $2, title = $3, description = $4
+    WHERE product_id = $5 AND is_archived = false AND user_id = $6;`,
+    values: [image, price, title, description, productId, userId],
+  });
+  const { rowCount } = updateQueryResponse;
+
+  if (!rowCount) {
+    throw createHttpError(404, 'Product not found', {
+      productId,
+    });
+  }
 
   return res.json({
-    // success: !!totalDeletedRows,
-    response,
-    msg: `product with id = ${productId} successfully deleted`,
+    success: !!rowCount,
+    updateQueryResponse,
+    productId,
+    msg: 'Product updated successfully.',
   });
 }
 
@@ -157,15 +174,3 @@ export const productControllersV1 = {
   deleteProduct,
   updateProduct,
 };
-
-// ✅ validating req.query.limit (FOR GET PRODUCTS)
-// const DEFAULT_TOTAL_PRODUCTS = 10;
-// const LimitValidationSchema = z
-//   .number()
-//   .min(1)
-//   .optional()
-//   .default(DEFAULT_TOTAL_PRODUCTS);
-// const queryLimit = isNaN(Number(req.query?.limit))
-//   ? DEFAULT_TOTAL_PRODUCTS
-//   : Number(req.query.limit);
-// const validatedLimitQueryParam = LimitValidationSchema.parse(queryLimit);

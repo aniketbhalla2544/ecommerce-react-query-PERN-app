@@ -8,6 +8,8 @@ import { FieldsObject, UknownObject } from '../../../types/general';
 import Spinner from '../../utils/Spinner';
 import { PiWarningLight } from 'react-icons/pi';
 import { ProductWithNoProductId } from '../../../types/products';
+import Input from './Input';
+// import { logger } from '../../../utils/logger';
 
 const DESCRIPTION_SIZE = 5;
 const MAX_PRICE = 1_00_000;
@@ -25,26 +27,32 @@ type FormState = FormStateFields & {
   errors: null | StringTypeFormStateFields;
 };
 
-type ThisProps = {
-  initialProductDetails?: FormStateFields;
-  onFormSubmittion: (product: ProductWithNoProductId) => Promise<void>;
-  allInputsDisabled: boolean;
+type ThisProps = Partial<FormStateFields> & {
   showModal: boolean;
+  modalTitle: string;
+  formSubmitBtnText: string;
+  allInputsDisabled: boolean;
   onClose: () => void;
+  onFormSubmittion: (product: ProductWithNoProductId) => Promise<void>;
 };
 
 const CreateUpdateProductModal = ({
-  allInputsDisabled,
-  initialProductDetails,
-  onFormSubmittion,
-  onClose,
+  image: initialImage = null,
+  title: initialTitle = '',
+  price: initialPrice = 0,
+  description: initialDescription = '',
   showModal,
+  modalTitle,
+  formSubmitBtnText,
+  allInputsDisabled,
+  onClose,
+  onFormSubmittion,
 }: ThisProps) => {
   const initialFormState: FormState = {
-    title: initialProductDetails?.title ?? '',
-    description: initialProductDetails?.description ?? '',
-    price: initialProductDetails?.price ?? 0,
-    image: initialProductDetails?.image ?? null,
+    image: initialImage,
+    title: initialTitle,
+    price: initialPrice,
+    description: initialDescription,
     errors: null,
   };
   const [formState, setFormState] = React.useState(initialFormState); // ✅
@@ -92,7 +100,6 @@ const CreateUpdateProductModal = ({
         image: z.string().trim().url().nullable(),
       });
       const validatedFormState = await FormStateSchema.parseAsync(formState);
-      // console.log('formState after validation: ', validatedFormState);
       // resetting errors
       setFormState((oldVal) => ({
         ...oldVal,
@@ -100,6 +107,7 @@ const CreateUpdateProductModal = ({
       }));
       return validatedFormState;
     } catch (error) {
+      toast.error('Unable to create  product 😮');
       if (error instanceof ZodError) {
         const errorIssues = error.issues;
         const errors: UknownObject = {};
@@ -114,13 +122,12 @@ const CreateUpdateProductModal = ({
           errors,
         }));
       }
-      return Promise.reject(null);
+      return null;
     }
   };
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // console.log('formState upon submitting form: ', formState);
     try {
       const validatedFormState = await validateForm();
       if (!validatedFormState) return;
@@ -149,7 +156,7 @@ const CreateUpdateProductModal = ({
         </div>
         {/* ------------- form ----------- */}
         <div className='px-10 pb-10 pt-4'>
-          <h3 className='text-xl font-semibold'>Create Product</h3>
+          <h3 className='text-xl font-semibold'>{modalTitle.trim()}</h3>
           <form onSubmit={handleFormSubmit}>
             <p className='text-gray-500 text-sm mt-6 mb-8'>
               <RequiredInputSymbol /> Indicates required fields.
@@ -167,26 +174,34 @@ const CreateUpdateProductModal = ({
             <div className='max-h-[400px] overflow-y-auto overflow-x-visible flex flex-col gap-y-6 px-2 py-4'>
               {/* ------------- upload image ---------------- */}
               {/* <div></div> */}
-              {/* --------- title ------------- */}
-              <div className='flex flex-col gap-y-3'>
-                <label htmlFor='title'>
-                  Title
-                  <RequiredInputSymbol />
-                </label>
-                <input
-                  disabled={allInputsDisabled}
-                  type='text'
-                  id='title'
-                  name='title'
-                  className={`input {}`}
-                  value={title}
-                  onChange={handleFormValuesChange}
-                  placeholder='Product Title'
-                />
-                {isTitleFieldError && titleFieldErrorMsg && (
-                  <p className='text-red-500 text-xs'>{titleFieldErrorMsg}</p>
-                )}
-              </div>
+              {/* --------- new title ------------- */}
+              <Input
+                labelText='Title'
+                htmlFor='title'
+                isInputError={isTitleFieldError}
+                errorMsg={titleFieldErrorMsg}
+                disabled={allInputsDisabled}
+                type='text'
+                id='title'
+                name='title'
+                value={title}
+                onChange={handleFormValuesChange}
+                placeholder='Product Title'
+              />
+
+              {/* --------- price ------------- */}
+              <Input
+                labelText='Price'
+                htmlFor='price'
+                isInputError={isPriceFieldError}
+                errorMsg={priceFieldErrorMsg}
+                disabled={allInputsDisabled}
+                type='text'
+                id='price'
+                name='price'
+                value={price}
+                onChange={handleFormValuesChange}
+              />
               {/* --------- description ------------- */}
               <div className='flex flex-col gap-y-3'>
                 <label htmlFor='description'>
@@ -208,25 +223,6 @@ const CreateUpdateProductModal = ({
                   <p className='text-red-500 text-xs'>{descriptionFieldErrorMsg}</p>
                 )}
               </div>
-              {/* --------- price ------------- */}
-              <div className='flex flex-col gap-y-3'>
-                <label htmlFor='price'>
-                  Price
-                  <RequiredInputSymbol />
-                </label>
-                <input
-                  disabled={allInputsDisabled}
-                  type='text'
-                  id='price'
-                  name='price'
-                  className='input'
-                  value={price}
-                  onChange={handleFormValuesChange}
-                />
-                {isPriceFieldError && priceFieldErrorMsg && (
-                  <p className='text-red-500 text-xs'>{priceFieldErrorMsg}</p>
-                )}
-              </div>
             </div>
             {/* ---------- actions -------------------- */}
             <div className='flex justify-end items-center pt-14'>
@@ -235,7 +231,7 @@ const CreateUpdateProductModal = ({
                 disabled={allInputsDisabled}
                 className='btn bg-blue-500 hover:bg-blue-400 text-white flex items-center justify-center gap-x-4'
               >
-                Create
+                {formSubmitBtnText.trim()}
                 <Spinner show={allInputsDisabled} />
               </button>
             </div>

@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createProduct } from '../../../api/products';
 import CreateUpdateProductModal from '../utils/CreateUpdateProductModal';
 import { ProductWithNoProductId } from '../../../types/products';
+import { logger } from '../../../utils/logger';
 
 type ThisProps = {
   showModal: boolean;
@@ -27,7 +28,7 @@ const CreateProductModal = ({ onClose, showModal, updatePage }: ThisProps) => {
   const onFormSubmittion = async (product: ProductWithNoProductId) => {
     const { title, description, price, image } = product;
     try {
-      // console.log('validatedFormState: ', validatedFormState);
+      logger.log('validatedFormState: ', product);
       await createProductMutation.mutateAsync({
         title,
         description,
@@ -46,10 +47,12 @@ const CreateProductModal = ({ onClose, showModal, updatePage }: ThisProps) => {
 
   return (
     <CreateUpdateProductModal
+      modalTitle='Create Product'
+      showModal={showModal}
+      formSubmitBtnText='Create'
+      onClose={onCloseModal}
       onFormSubmittion={onFormSubmittion}
       allInputsDisabled={createProductMutation.isPending}
-      showModal={showModal}
-      onClose={onCloseModal}
     />
   );
 };

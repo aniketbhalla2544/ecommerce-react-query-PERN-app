@@ -11,14 +11,20 @@ import { BsPencilSquare } from 'react-icons/bs';
 import DeleteProductModal from './sub-components/DeleteProductModal';
 import usePaginatedProducts from './hooks/usePaginatedProducts';
 import UpperControlBoard from './sub-components/UpperControlBoard/UpperControlBoard';
+import UpdateProductModal from './sub-components/UpdateProductModal';
+import { logger } from '../../utils/logger';
 
 const PaginatedProducts = () => {
   const {
     limit,
     isPending,
+    error,
     isError,
     queryResponseData,
     page,
+    updateProductModalState,
+    handleUpdateProductIconClick,
+    onUpdateProductModalClose,
     deleteProductModalState,
     handleLimitChange,
     handlePageIncrement,
@@ -29,9 +35,16 @@ const PaginatedProducts = () => {
     updatePage,
   } = usePaginatedProducts();
 
-  if (isPending || !queryResponseData) return <Spinner />;
+  if (isPending) return <Spinner />;
 
-  if (isError) return <h3 className='font-bold text-xl'>🔴 Error</h3>;
+  if (isError) {
+    logger.error('Error while while fetching data: ', error?.message);
+    return <h3 className='font-bold text-xl'>🔴 Error loading data.</h3>;
+  }
+
+  if (!queryResponseData || !queryResponseData.data) {
+    return <h4>😶 No data found.</h4>;
+  }
 
   const {
     data: products,
@@ -69,7 +82,10 @@ const PaginatedProducts = () => {
               >
                 <MdDelete />
               </button>
-              <button onClick={() => {}} className='flex-none hover:text-blue-500 p-2'>
+              <button
+                onClick={() => handleUpdateProductIconClick(product.product_id)}
+                className='flex-none hover:text-blue-500 p-2'
+              >
                 <BsPencilSquare />
               </button>
             </li>
@@ -83,7 +99,6 @@ const PaginatedProducts = () => {
               <p className='text-gray-500'>Rows per page</p>
               {/* ----------- limit control --------------- */}
               <select
-                defaultValue='15'
                 value={limit}
                 onChange={handleLimitChange}
                 required
@@ -146,6 +161,11 @@ const PaginatedProducts = () => {
         showModal={deleteProductModalState.showModal}
         onCancelBtnClick={handleDeleteProductModalCancelBtnClick}
         onDeleteBtnClick={handleProductDeletion}
+      />
+      <UpdateProductModal
+        productId={updateProductModalState.productId}
+        showModal={updateProductModalState.showModal}
+        onClose={onUpdateProductModalClose}
       />
     </>
   );

@@ -6,4 +6,6 @@ export type Product = {
   image: null | string;
 };
 
+export type ProductWithNoProductId = Omit<Product, 'product_id'>;
+
 export type Products = Product[];

@@ -13,13 +13,14 @@ const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunct
     const exposedToClient = err.expose;
     if (exposedToClient) {
       const status = err.statusCode ?? err.status ?? 500;
-      const msg = err.message;
+      const message = err.message;
       const name = err.name ?? DEFAULT_ERROR_NAME;
       const httpError = {
-        status,
+        ...err,
         success: false,
+        message,
         name,
-        msg,
+        status,
       };
       console.log(httpError);
       // apploggers.jsonLogger.error(httpError);

@@ -6,7 +6,6 @@ export const validateGetProducts = (req: Request, res: Response, next: NextFunct
 };
 
 export const validateProductId = (req: Request, res: Response, next: NextFunction) => {
-  console.log('validateProductId from validation middleware');
   const productId = Number(req.params.id.trim());
 
   // ✅ validating productId

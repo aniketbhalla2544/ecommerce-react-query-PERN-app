@@ -2,11 +2,16 @@ import React from 'react';
 import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteProduct, fetchProducts } from '../../../api/products';
+import { logger } from '../../../utils/logger';
 
 const usePaginatedProducts = () => {
   const [deleteProductModalState, setDeleteProductModalState] = React.useState({
     showModal: false,
     showSpinner: false,
+    productId: 0,
+  });
+  const [updateProductModalState, setUpdateProductModalState] = React.useState({
+    showModal: false,
     productId: 0,
   });
   const [paginationState, updatePaginationState] = React.useState({
@@ -18,6 +23,7 @@ const usePaginatedProducts = () => {
     data: queryResponseData,
     isPending,
     isError,
+    error,
   } = useQuery({
     queryKey: ['products', { limit, page }],
     queryFn: () => fetchProducts(page, limit),
@@ -25,6 +31,7 @@ const usePaginatedProducts = () => {
     staleTime: 1000 * 60 * 3,
   });
   const queryClient = useQueryClient();
+
   const updatePage = React.useCallback((newPage: number) => {
     updatePaginationState((oldVal) => ({
       ...oldVal,
@@ -32,7 +39,7 @@ const usePaginatedProducts = () => {
     }));
   }, []);
 
-  const mutation = useMutation({
+  const deleteMutation = useMutation({
     mutationFn: deleteProduct,
     mutationKey: ['products'],
     retry: 3,
@@ -71,7 +78,7 @@ const usePaginatedProducts = () => {
     const isInvalid = !toBeDeletedProductId;
     if (isInvalid) {
       toast.error('Unable to delete product.');
-      console.error(
+      logger.error(
         'Invalid product id while deleting product with id: ',
         toBeDeletedProductId
       );
@@ -105,12 +112,12 @@ const usePaginatedProducts = () => {
         ...oldVal,
         showSpinner: true,
       }));
-      await mutation.mutateAsync(deleteProductModalState.productId);
+      await deleteMutation.mutateAsync(deleteProductModalState.productId);
       toast.success('Product successfully deleted');
-      console.log('trying to delete productId: ', toBeDeletedProductId);
+      logger.log('trying to delete productId: ', toBeDeletedProductId);
     } catch (error) {
       toast.error('Unable to delete product.');
-      console.error('Error while deleting prodcut with id: ', toBeDeletedProductId);
+      logger.error('Error while deleting prodcut with id: ', toBeDeletedProductId);
     } finally {
       setDeleteProductModalState((oldVal) => ({
         ...oldVal,
@@ -121,10 +128,31 @@ const usePaginatedProducts = () => {
     }
   };
 
+  const handleUpdateProductIconClick = (productId: number) => {
+    // ✅ productId validation
+    if (!+productId) {
+      toast.error('Unable to update product 😮');
+      logger.error('Unable to update product because of invalid product id: ', productId);
+      return;
+    }
+    setUpdateProductModalState({
+      productId,
+      showModal: true,
+    });
+  };
+
+  const onUpdateProductModalClose = () => {
+    setUpdateProductModalState({
+      productId: 0,
+      showModal: false,
+    });
+  };
+
   return {
     limit,
     isPending,
     isError,
+    error,
     queryResponseData,
     page,
     deleteProductModalState,
@@ -132,6 +160,9 @@ const usePaginatedProducts = () => {
     handleLimitChange,
     handlePageIncrement,
     handlePageDecrement,
+    updateProductModalState,
+    handleUpdateProductIconClick,
+    onUpdateProductModalClose,
     handleDeleteProductModalCancelBtnClick,
     handleDeleteProductTrashBtnIconClick,
     handleProductDeletion,

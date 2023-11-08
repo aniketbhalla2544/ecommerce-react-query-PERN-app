@@ -8,6 +8,7 @@
     "start": "set NODE_ENV=production&& node -r tsconfig-paths/register dist/server.js",
     "lint": "eslint . --ext .ts",
     "build": "tsc",
+    "local-start": "node dist/src/server.js",
     "test": "echo \"Error: no test specified\"&& exit 1"
   },
   "author": "Aniket Bhalla",

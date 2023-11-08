@@ -2,24 +2,26 @@ version: '3.8'
 services:
   db:
     image: postgres
+    restart: always
     environment:
-      POSTGRES_DB: dynoecomdb
-      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: localpostgresdb
     ports:
       - "5432:5432"
+    volumes:
+      - ./init_scripts:/docker-entrypoint-initdb.d
   backend:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "5000:5000"
+      - "3000:3000"
     environment:
-      PGDATABASE: dynoecomdb
-      PGUSER: postgres
-      PGPASSWORD: localpostgresdb
-      PGHOST: db
-      PGPORT: 5432
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: localpostgresdb
+      PG_HOST: db
+      PG_PORT: 5432
+      PORT: 3000
     depends_on:
       - db
   frontend:
@@ -30,3 +32,5 @@ services:
       - "80:80"
     depends_on:
       - backend
+    volumes:
+      - ./client/nginx.conf:/etc/nginx/conf.d/nginx.conf

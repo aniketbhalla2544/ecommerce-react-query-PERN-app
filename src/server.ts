@@ -6,8 +6,8 @@ import cors from 'cors';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
-import errorHandler, { INVALID_ROUTE_MSG } from 'middlewares/errorHandler';
-import productsRouterV1 from 'api/v1/products/routes';
+import errorHandler, { INVALID_ROUTE_MSG } from './middlewares/errorHandler';
+import productsRouterV1 from './api/v1/products/routes';
 
 const PORT = process.env.PORT || 3003;
 const app = express();

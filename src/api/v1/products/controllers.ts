@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { USER_ID, pgquery } from 'db';
 import { z } from 'zod';
 import createHttpError from 'http-errors';
-import { getOffset } from 'api/db/queryHelpers';
+import { getOffset } from '../../db/queryHelpers';
+import { USER_ID, pgquery } from '../../../db';
 
 async function getProduct(req: Request, res: Response) {
   const userId = USER_ID;

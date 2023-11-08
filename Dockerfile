@@ -1,17 +1,9 @@
-# ---- Build Stage ----
-FROM node:18 AS build-stage
-WORKDIR /api
+FROM node:16-alpine
+WORKDIR /app
 COPY package*.json ./
-RUN npm install
-COPY . ./
+RUN npm install 
+COPY tsconfig.json ./
+COPY src ./src
 RUN npm run build
-
-# ---- Release Stage ----
-FROM node:18 AS release-stage
-WORKDIR /api
-
-# Copying necessary files from the build stage
-COPY --from=build-stage /api/node_modules ./node_modules
-COPY --from=build-stage /api/dist ./dist
-EXPOSE 8080
-CMD ["node", "./dist/src/server.js"]
+EXPOSE 3000
+CMD ["node", "dist/src/server.js"]

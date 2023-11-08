@@ -23,9 +23,36 @@ const pool = new Pool({
 });
 
 // # events
-// pool.on('connect', (client) => {
-pool.on('connect', () => {
-  // console.log('Connection established by a client');
+pool.on('connect', async (client) => {
+  try {
+    const response = await client.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        user_id SERIAL PRIMARY KEY,
+        firstname VARCHAR(60) NOT NULL,
+        lastname VARCHAR(60),
+        email VARCHAR(150) NOT NULL,
+        is_premium BOOLEAN NOT NULL DEFAULT FALSE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      );
+
+      CREATE TABLE IF NOT EXISTS products (
+        product_id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
+        title VARCHAR(120) NOT NULL,
+        price NUMERIC DEFAULT 1, 
+        description TEXT,
+        image TEXT,
+        is_archived BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT description_length_check CHECK (LENGTH(description) >= 10)
+      );
+    `);
+    console.log('Tables created or verified successfully, response: ', response);
+  } catch (err) {
+    console.error('Error during database tables creation', err);
+    process.exit();
+  }
 });
 
 // pool.on('error', (err: Error, client: Client) => {

@@ -1,5 +1,3 @@
--- -------
--- Tables
 CREATE TABLE users (
   user_id SERIAL PRIMARY KEY,
   firstname VARCHAR(60) NOT NULL,
@@ -7,7 +5,7 @@ CREATE TABLE users (
   email VARCHAR(150) NOT NULL,
   is_premium BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-)
+);
 
 CREATE TABLE products (
   product_id SERIAL PRIMARY KEY,
@@ -20,31 +18,11 @@ CREATE TABLE products (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT description_length_check CHECK (LENGTH(description) >= 10),
-  CONSTRAINT fk_products_to_user FOREIGN KEY(user_id) REFERENCES users(user_id),
-)
--- -------
+  CONSTRAINT fk_products_to_user FOREIGN KEY(user_id) REFERENCES users(user_id)
+);
 
--- -------
--- Insertions
-INSERT INTO products (title, price, description) VALUES
-  ('Electric', 149.99, 'Experience unparallel product.'),
-
-SELECT * FROM products ORDER BY product_id;
--- -------
-
--- -- Selections
--- products
-SELECT * FROM products;
-
--- -------
--- resetting product_id sequence to the current max sequence id
-SELECT setval('products_product_id_seq', (SELECT max(product_id) FROM products));
-SELECT setval('products_product_id_seq', 1);
--- -------
-
--- -------
--- sql script to generate 50 products randomly
-SELECT setval('products_product_id_seq', 1, false); 
+INSERT INTO users (user_id, firstname, lastname, email)
+VALUES (1, 'aniket', 'bhalla', 'ab@gmail.com');
 
 DO $$
 DECLARE
@@ -63,5 +41,3 @@ BEGIN
     );
   END LOOP;
 END $$;
--- -------
-

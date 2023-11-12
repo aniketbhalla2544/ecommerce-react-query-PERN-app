@@ -1,7 +1,7 @@
 import toast from 'react-hot-toast';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createProduct } from '../../../api/products';
-import CreateUpdateProductModal from '../utils/CreateUpdateProductModal';
+import CreateUpdateProductModal from '../utils/CreateUpdateProductModal/CreateUpdateProductModal';
 import { ProductWithNoProductId } from '../../../types/products';
 import { logger } from '../../../utils/logger';
 

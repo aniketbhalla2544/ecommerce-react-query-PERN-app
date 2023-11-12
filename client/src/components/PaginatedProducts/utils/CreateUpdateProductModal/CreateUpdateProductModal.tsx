@@ -1,14 +1,15 @@
 import React from 'react';
 import { FiX } from 'react-icons/fi';
-import Modal from '../../utils/Modal';
+import Modal from '../../../utils/Modal';
 import toast from 'react-hot-toast';
 import { z, ZodError } from 'zod';
-import RequiredInputSymbol from '../../utils/RequiredInputSymbol';
-import { FieldsObject, UknownObject } from '../../../types/general';
-import Spinner from '../../utils/Spinner';
+import RequiredInputSymbol from '../../../utils/RequiredInputSymbol';
+import { FieldsObject, UknownObject } from '../../../../types/general';
+import Spinner from '../../../utils/Spinner';
 import { PiWarningLight } from 'react-icons/pi';
-import { ProductWithNoProductId } from '../../../types/products';
-import Input from './Input';
+import { ProductWithNoProductId } from '../../../../types/products';
+import Input from '../Input';
+import UploadProductImage from './sub-components/UploadProductImage';
 // import { logger } from '../../../utils/logger';
 
 const DESCRIPTION_SIZE = 5;
@@ -173,7 +174,9 @@ const CreateUpdateProductModal = ({
             {/* ----------- form controls ----------------------------- */}
             <div className='max-h-[400px] overflow-y-auto overflow-x-visible flex flex-col gap-y-6 px-2 py-4'>
               {/* ------------- upload image ---------------- */}
-              {/* <div></div> */}
+              <div>
+                <UploadProductImage />
+              </div>
               {/* --------- new title ------------- */}
               <Input
                 labelText='Title'

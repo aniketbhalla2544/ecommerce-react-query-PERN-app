@@ -76,16 +76,29 @@ async function getProducts(req: Request, res: Response) {
 
 async function createProduct(req: Request, res: Response) {
   const userId = USER_ID;
-  const newProduct = req.body;
+  // const uploadedImgPublicId = res.locals?.uploadedImgDetails.public_id ?? null;
+
+  const newProduct = {
+    title: req.body.title,
+    description: req.body.description,
+    price: +req.body.price,
+    imageURL: res.locals?.uploadedImgDetails?.secure_url || null,
+  };
+
+  console.log({ newProduct });
 
   // ✅ product type validation
   const ProductSchema = z.object({
     title: z.string().trim().min(2).max(120),
     description: z.string().trim().min(10),
-    price: z.number().min(1).optional().default(1),
-    image: z.string().trim().url().nullable().optional(),
+    price: z.number().min(1),
+    imageURL: z.string().trim().url().optional().nullable(),
   });
   const validatedNewProduct = ProductSchema.parse(newProduct);
+
+  console.log({
+    validatedNewProduct,
+  });
 
   const response = await pgquery({
     text: `INSERT INTO products (user_id, title, price, description, image) 
@@ -96,7 +109,7 @@ async function createProduct(req: Request, res: Response) {
       validatedNewProduct.title,
       validatedNewProduct.price,
       validatedNewProduct.description,
-      validatedNewProduct.image,
+      validatedNewProduct.imageURL,
     ],
   });
   return res.json({
@@ -134,6 +147,18 @@ async function deleteProduct(req: Request, res: Response) {
 async function updateProduct(req: Request, res: Response) {
   const userId = USER_ID;
   const productId = Number(req.params.id.trim());
+  const reqBody = req.body;
+
+  const updatedProduct = {
+    title: reqBody.title,
+    description: reqBody.description,
+    price: +reqBody.price,
+    image: res.locals?.uploadedImgDetails?.secure_url || reqBody.imageURL || null,
+  };
+
+  console.log({
+    updatedProduct,
+  });
 
   // validate the req body
   const ProductSchema = z.object({
@@ -142,7 +167,7 @@ async function updateProduct(req: Request, res: Response) {
     price: z.number().min(1),
     image: z.string().trim().url().nullable(),
   });
-  const validtedUpdatedProduct = ProductSchema.parse(req.body);
+  const validtedUpdatedProduct = ProductSchema.parse(updatedProduct);
   const { image, price, title, description } = validtedUpdatedProduct;
 
   const updateQueryResponse = await pgquery({

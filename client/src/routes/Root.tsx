@@ -8,7 +8,6 @@ const Root = () => {
     <div className='overflow-hidden'>
       <Container>
         <Header />
-        <h1>in root</h1>
         <Outlet />
       </Container>
     </div>

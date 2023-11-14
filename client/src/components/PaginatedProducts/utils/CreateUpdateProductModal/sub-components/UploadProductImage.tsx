@@ -2,10 +2,16 @@ import React, { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { LuUpload } from 'react-icons/lu';
 import { IoClose } from 'react-icons/io5';
+import { useCreateUpdateProductContext } from '../context/useCreateUpdateProductContext';
 
-const UploadProductImage = () => {
-  const [img, setImg] = React.useState('');
-  const borderWidth = img ? 0 : 1;
+type ThisProps = {
+  initialImgURL: string;
+};
+
+const UploadProductImage = ({ initialImgURL }: ThisProps) => {
+  const { updateFormFields } = useCreateUpdateProductContext();
+  const [previewImgURL, setPreviewImgURL] = React.useState(initialImgURL);
+  const borderStyle = previewImgURL ? 'border-0' : 'border-[1px]';
 
   const validateUploadedImg = (file: File) => {
     const { size, type } = file;
@@ -13,14 +19,14 @@ const UploadProductImage = () => {
     // ✅ image size
     const MB_5 = 5_242_880;
     if (size > MB_5) {
-      toast.error('Img exceeds max allowed img size of 5mbs');
+      toast.error('Img exceeds max allowed img size of 5mbs 😵‍💫');
       return false;
     }
 
     // ✅ img type
     const isFileImgType = type.startsWith('image/');
     if (!isFileImgType) {
-      toast.error('Only image type uploads are allowed');
+      toast.error('Only image type uploads are allowed 🤕');
       return false;
     }
     return true;
@@ -37,29 +43,32 @@ const UploadProductImage = () => {
     const uploadedImgFile = uploadedFiles[0];
     const isFileValid = validateUploadedImg(uploadedImgFile);
     if (!isFileValid) return;
-    console.log({
-      uploadedImgFile,
-    });
     const previewURL = URL.createObjectURL(uploadedImgFile);
-    setImg(previewURL);
+    setPreviewImgURL(previewURL); // local img state
+
+    updateFormFields({
+      image: uploadedImgFile,
+      imageURL: null,
+    });
   };
 
   const handleRemoveImgBtnClick = () => {
-    setImg('');
+    setPreviewImgURL('');
+    updateFormFields({
+      image: null,
+      imageURL: null,
+    });
   };
 
   useEffect(() => {
     return () => {
-      if (img) {
-        console.log('Object URL removed');
-        URL.revokeObjectURL(img);
-      }
+      if (previewImgURL) URL.revokeObjectURL(previewImgURL);
     };
-  }, [img]);
+  }, [previewImgURL]);
 
   return (
     <div
-      className={`relative border-[${borderWidth}px] border-blue-500 rounded-md border-dashed w-32 h-32 flex-center hover:bg-blue-50 overflow-hidden`}
+      className={`relative ${borderStyle} border-blue-500 rounded-md border-dashed w-32 h-32 flex-center hover:bg-blue-50 overflow-hidden`}
     >
       <input
         accept='image/*'
@@ -69,7 +78,7 @@ const UploadProductImage = () => {
         className='absolute top-0 right-0 bottom-0 left-0 opacity-0 hover:cursor-pointer'
       />
 
-      {img ? (
+      {previewImgURL ? (
         <>
           <button
             className='rounded-full bg-gray-600 hover:bg-gray-500 opacity-60 right-2 top-2 w-5 h-5 absolute flex-center text-red p-1'
@@ -82,7 +91,7 @@ const UploadProductImage = () => {
             />
           </button>
           <img
-            src={img}
+            src={previewImgURL}
             className='w-full h-full object-cover top-0 right-0 bottom-0 left-0'
             alt='preview-img'
           />

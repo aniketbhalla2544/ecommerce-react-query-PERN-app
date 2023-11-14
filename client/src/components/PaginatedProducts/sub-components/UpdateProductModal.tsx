@@ -2,8 +2,8 @@ import toast from 'react-hot-toast';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { updateProduct, fetchProduct } from '../../../api/products';
 import CreateUpdateProductModal from '../utils/CreateUpdateProductModal/CreateUpdateProductModal';
-import { ProductWithNoProductId } from '../../../types/products';
 import { logger } from '../../../utils/logger';
+import { MutationProduct } from './CreateProductModal';
 
 type ThisProps = {
   productId: number;
@@ -23,6 +23,7 @@ const UpdateProductModal = ({ onClose, showModal, productId }: ThisProps) => {
     queryKey: ['products', { id: productId }],
     queryFn: () => fetchProduct(productId),
     enabled: isProductQueryEnabled,
+    refetchOnWindowFocus: false,
   });
 
   const updateProductMutation = useMutation({
@@ -36,13 +37,13 @@ const UpdateProductModal = ({ onClose, showModal, productId }: ThisProps) => {
     },
   });
 
-  const onFormSubmittion = async (product: ProductWithNoProductId) => {
-    const { title, description, price, image } = product;
+  const onFormSubmittion = async (product: MutationProduct) => {
+    const { title, description, price, image, imageURL } = product;
     try {
       // logger.log('validatedFormState: ', validatedFormState);
       await updateProductMutation.mutateAsync({
         productId,
-        product: { title, description, price, image },
+        product: { title, description, price, image, imageURL },
       });
       toast.success('Product updated successfully 😄');
       logger.log(product);
@@ -74,9 +75,9 @@ const UpdateProductModal = ({ onClose, showModal, productId }: ThisProps) => {
   return (
     <CreateUpdateProductModal
       description={data.description}
-      image={data.image}
       price={data.price}
       title={data.title}
+      imageURL={data.image}
       formSubmitBtnText='Update'
       modalTitle='Update Product'
       showModal={showModal}

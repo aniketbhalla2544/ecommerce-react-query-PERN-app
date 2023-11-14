@@ -2,8 +2,13 @@ import toast from 'react-hot-toast';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createProduct } from '../../../api/products';
 import CreateUpdateProductModal from '../utils/CreateUpdateProductModal/CreateUpdateProductModal';
-import { ProductWithNoProductId } from '../../../types/products';
 import { logger } from '../../../utils/logger';
+import { Product } from '../../../types/products';
+
+export type MutationProduct = Pick<Product, 'description' | 'price' | 'title'> & {
+  image: File | null;
+  imageURL: string | null;
+};
 
 type ThisProps = {
   showModal: boolean;
@@ -25,8 +30,8 @@ const CreateProductModal = ({ onClose, showModal, updatePage }: ThisProps) => {
     },
   });
 
-  const onFormSubmittion = async (product: ProductWithNoProductId) => {
-    const { title, description, price, image } = product;
+  const onFormSubmittion = async (product: MutationProduct) => {
+    const { title, description, price, image, imageURL } = product;
     try {
       logger.log('validatedFormState: ', product);
       await createProductMutation.mutateAsync({
@@ -34,6 +39,7 @@ const CreateProductModal = ({ onClose, showModal, updatePage }: ThisProps) => {
         description,
         price,
         image,
+        imageURL,
       });
       toast.success('Product created successfully 😄');
     } catch (error) {

@@ -1,3 +1,4 @@
+import { MutationProduct } from '../components/PaginatedProducts/sub-components/CreateProductModal';
 import { Product, Products } from '../types/products';
 import { apiClient } from './config';
 
@@ -42,20 +43,35 @@ export const deleteProduct = async (productId: number) => {
 // ---------- deleteProduct
 type UpdateProductParams = {
   productId: number;
-  product: Partial<Product>;
+  product: MutationProduct;
 };
 
 export const updateProduct = async ({ productId, product }: UpdateProductParams) => {
-  await apiClient.patch(`/products/${productId}`, product);
+  const { title, description, price, image, imageURL } = product;
+
+  const formData = new FormData();
+  formData.append('title', title);
+  formData.append('description', description);
+  formData.append('price', String(price));
+  formData.append('image', image ?? new File([], '')); // File type
+  formData.append('imageURL', imageURL ?? '');
+
+  await apiClient.put(`/products/${productId}`, formData);
 };
 
 // ---------- createProduct
-export const createProduct = async (product: Omit<Product, 'product_id'>) => {
+export const createProduct = async (product: MutationProduct) => {
   const { title, price, description, image } = product;
-  await apiClient.post('/products/', {
-    title,
-    description,
-    price,
-    image,
+
+  console.log({
+    newProduct: product,
   });
+
+  const formData = new FormData();
+  formData.append('title', title);
+  formData.append('description', description);
+  formData.append('price', String(price));
+  formData.append('image', image ?? new File([], '')); // File type
+
+  await apiClient.post('/products/', formData);
 };

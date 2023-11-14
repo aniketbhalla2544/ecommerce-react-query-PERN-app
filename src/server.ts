@@ -8,8 +8,10 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import errorHandler, { INVALID_ROUTE_MSG } from './middlewares/errorHandler';
 import productsRouterV1 from './api/v1/products/routes';
+import cloudinary from './services/cloudinary';
 
-const PORT = process.env.PORT || 3003;
+const env = process.env;
+const PORT = env.PORT || 3003;
 const app = express();
 
 // app middlewares
@@ -19,30 +21,39 @@ app.use(express.urlencoded({ extended: false }));
 app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(helmet());
+cloudinary.config({
+  cloud_name: env.CLOUDINARY_CLOUD_NAME,
+  api_key: env.CLOUDINARY_API_KEY,
+  api_secret: env.CLOUDINARY_API_SECRET,
+  secure: true,
+});
 
-// routes
-app.get('/', (req, res) => {
-  return res.json({
-    msg: 'Dyno Expresss server running from Docker Container',
+function init() {
+  // routes
+  app.get('/', (req, res) => {
+    return res.json({
+      msg: 'Dyno Expresss server running from Docker Container',
+    });
   });
-});
 
-app.get('/api', async (_req, res) => {
-  return res.json({
-    success: true,
-    msg: 'server running',
+  app.get('/api', async (_req, res) => {
+    return res.json({
+      success: true,
+      msg: 'server running',
+    });
   });
-});
 
-app.use('/api/v1/products', productsRouterV1);
+  app.use('/api/v1/products', productsRouterV1);
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-app.all('*', (_req, _res, next) => {
-  next(new Error(INVALID_ROUTE_MSG));
-});
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  app.all('*', (_req, _res, next) => {
+    next(new Error(INVALID_ROUTE_MSG));
+  });
 
-app.use(errorHandler);
+  app.use(errorHandler);
+}
 
 app.listen(PORT, () => {
   console.log(`Express server running on PORT: ${PORT}`);
+  init();
 });

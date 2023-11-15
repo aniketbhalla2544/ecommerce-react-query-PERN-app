@@ -8,10 +8,10 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import errorHandler, { INVALID_ROUTE_MSG } from './middlewares/errorHandler';
 import productsRouterV1 from './api/v1/products/routes';
-import cloudinary from './services/cloudinary';
+import cloudinary from './services/cloudinary/cloudinary';
 
 const env = process.env;
-const PORT = env.PORT || 3003;
+const PORT = env.PORT || 3004;
 const app = express();
 
 // app middlewares
@@ -32,18 +32,19 @@ function init() {
   // routes
   app.get('/', (req, res) => {
     return res.json({
-      msg: 'Dyno Expresss server running from Docker Container',
+      msg: 'Vendor server running',
     });
   });
 
   app.get('/api', async (_req, res) => {
     return res.json({
       success: true,
-      msg: 'server running',
+      msg: 'Vendor server running',
     });
   });
 
-  app.use('/api/v1/products', productsRouterV1);
+  app.use('/api/vendor/v1/products', productsRouterV1);
+  app.use('/api/vendor/v1/vendors', productsRouterV1);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   app.all('*', (_req, _res, next) => {

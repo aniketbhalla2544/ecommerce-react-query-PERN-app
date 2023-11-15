@@ -1,7 +1,7 @@
 import RequiredInputSymbol from '../../../../utils/RequiredInputSymbol';
 import { PiWarningLight } from 'react-icons/pi';
 import UploadProductImage from './UploadProductImage';
-import Input from '../../Input';
+import Input from '../../../../utils/Input';
 import { useCreateUpdateProductContext } from '../context/useCreateUpdateProductContext';
 import Spinner from '../../../../utils/Spinner';
 import { CreateUpdateProductModalProps } from '../CreateUpdateProductModal';
@@ -107,7 +107,7 @@ const ProductForm = ({ modalTitle, allInputsDisabled, formSubmitBtnText }: ThisP
           <button
             type='submit'
             disabled={allInputsDisabled}
-            className='btn bg-blue-500 hover:bg-blue-400 text-white flex items-center justify-center gap-x-4'
+            className='btn bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center gap-x-4'
           >
             {formSubmitBtnText.trim()}
             <Spinner show={allInputsDisabled} />

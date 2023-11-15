@@ -1,3 +1,5 @@
+export const isProductionEnv = process.env.NODE_ENV === 'production';
+
 export const priceFormatter = (price: number) => {
   const formatterEnCA = new Intl.NumberFormat('en-CA', {
     style: 'currency',

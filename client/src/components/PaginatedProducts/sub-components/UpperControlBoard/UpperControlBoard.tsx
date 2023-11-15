@@ -21,7 +21,7 @@ const UpperControlBoard = ({ updatePage }: ThisProps) => {
       <div className='flex justify-end items-center mb-10'>
         <button
           onClick={handleCreateProductBtnClick}
-          className='btn bg-blue-500 hover:bg-blue-400 text-white rounded-full'
+          className='btn bg-blue-500 hover:bg-blue-600 text-white rounded-full'
         >
           Create
         </button>

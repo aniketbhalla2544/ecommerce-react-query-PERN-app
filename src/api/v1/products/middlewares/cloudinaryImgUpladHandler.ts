@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { uploadImageFileToCloudinary } from '../../../../services/cloudinary';
+import { uploadImageFileToCloudinary } from '../../../../services/cloudinary/cloudinary';
 import { USER_ID } from '../../../../db';
 
 const cloudinaryImgUpladHandler = async (

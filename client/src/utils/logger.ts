@@ -1,18 +1,18 @@
-const isProductEnv = process.env.NODE_ENV === 'production';
+import { isProductionEnv } from './utils';
 
 export const logger = {
   log: (...args: unknown[]) => {
-    if (!isProductEnv) {
+    if (!isProductionEnv) {
       console.log(...args);
     }
   },
   error: (...args: unknown[]) => {
-    if (!isProductEnv) {
+    if (!isProductionEnv) {
       console.error(...args);
     }
   },
   warn: (...args: unknown[]) => {
-    if (!isProductEnv) {
+    if (!isProductionEnv) {
       console.warn(...args);
     }
   },

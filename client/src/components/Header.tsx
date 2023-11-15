@@ -11,6 +11,10 @@ const navItems = [
     path: '/dashboard',
     text: 'dashboard',
   },
+  {
+    path: '/vendor/signup',
+    text: 'Signup',
+  },
 ];
 
 const Header = () => {

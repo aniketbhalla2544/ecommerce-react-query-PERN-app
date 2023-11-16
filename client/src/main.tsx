@@ -7,6 +7,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import Root from './routes/Root';
 import Dashboard from './routes/Dashboard';
 import VendorSignup from './routes/vendorSignup/VendorSignup';
+import VendorSignin from './routes/vendorSignin/VendorSignin';
 
 const router = createBrowserRouter([
   {
@@ -20,8 +21,12 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: '/vendor/signup',
+    path: '/vendor/register',
     element: <VendorSignup />,
+  },
+  {
+    path: '/vendor/signin',
+    element: <VendorSignin />,
   },
 ]);
 

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import validator from 'validator';
+// import { logger } from '../../utils/logger';
 
 const vendorSignupFormZodValidationSchema = z
   .object({
@@ -14,7 +15,7 @@ const vendorSignupFormZodValidationSchema = z
   .refine(
     (data) => {
       const dataPassword = data.password;
-      console.log('password: ', dataPassword);
+      // logger.log('password: ', dataPassword);
       const isStrongPassword = validator.isStrongPassword(dataPassword, {
         minLength: 8,
         minLowercase: 1,
@@ -25,11 +26,11 @@ const vendorSignupFormZodValidationSchema = z
       const inBetweenSpaceCheckingRegex = /\s/;
       const noSpacesInPassword = !inBetweenSpaceCheckingRegex.test(dataPassword);
       const isPasswordValid = isStrongPassword && noSpacesInPassword;
-      console.log('valid password: ', {
-        isStrongPassword,
-        noSpacesInPassword,
-        isPasswordValid,
-      });
+      // logger.log('valid password: ', {
+      //   isStrongPassword,
+      //   noSpacesInPassword,
+      //   isPasswordValid,
+      // });
       return isPasswordValid;
     },
     {

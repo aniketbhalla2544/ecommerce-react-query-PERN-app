@@ -6,6 +6,7 @@ type ThisProps = DetailedHTMLProps<
   HTMLInputElement
 > & {
   labelText: string;
+  labelSufixText?: string;
   htmlFor: string;
   isInputError: boolean;
   errorMsg: string;
@@ -16,6 +17,7 @@ const Input = ({
   htmlFor,
   isInputError,
   errorMsg,
+  labelSufixText = '',
   ...otherProps
 }: ThisProps) => {
   const ringColorStyle = isInputError
@@ -27,8 +29,10 @@ const Input = ({
       <label htmlFor={htmlFor}>
         {labelText.trim()}
         <RequiredInputSymbol />
+        <span className='text-xs text-gray-500'>{labelSufixText.trimEnd()}</span>
       </label>
       <input
+        id={htmlFor}
         className={`rounded-md border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2  ${ringColorStyle}`}
         {...otherProps}
       />

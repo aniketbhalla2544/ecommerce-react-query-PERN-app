@@ -12,8 +12,12 @@ const navItems = [
     text: 'dashboard',
   },
   {
-    path: '/vendor/signup',
-    text: 'Signup',
+    path: '/vendor/register',
+    text: 'Register',
+  },
+  {
+    path: '/vendor/signin',
+    text: 'Sign in',
   },
 ];
 

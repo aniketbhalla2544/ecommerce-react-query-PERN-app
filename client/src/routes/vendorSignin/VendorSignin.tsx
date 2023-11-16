@@ -1,41 +1,38 @@
 import { PiWarningLight } from 'react-icons/pi';
 import Input from '../../components/utils/Input';
-import useVendorSignup from './hooks/useVendorSignup';
 import Spinner from '../../components/utils/Spinner';
 import IndeterminateProgressBar from '../../components/utils/IndeterminateProgressBar';
 import { Link } from 'react-router-dom';
+import useVendorSignin from './hooks/useVendorSignin';
 
 // TODO: add show password icon to password input
 
-const VendorSignup = () => {
+const VendorSignin = () => {
   const {
     validationState: {
       haveErrors,
-      isFullnameInputError,
-      fullnameInputErrorMsg,
       isEmailInputError,
       emailInputErrorMsg,
       isPasswordInputError,
       passwordInputErrorMsg,
       isFormSubmitBtnDisabled,
       allFormControlsDisabled,
-      isRegisterationStatusLoading,
+      isSigninStatusLoading,
       isVendorConflictError,
     },
-    formState: { fullname, email, password, enterTestValues },
+    formState: { email, password, enterTestValues },
     isDefaultValuesBtnVisible,
     handleFormValues,
     handleFormSubmit,
-    handleOnBlurEventOnFormInputFields,
-  } = useVendorSignup();
+  } = useVendorSignin();
 
   return (
     <div className='min-h-screen flex-center bg-gray-100 py-12'>
       <div className='min-w-[450px] max-w-[500px] bg-white shadow-md rounded-xl overflow-hidden'>
-        <IndeterminateProgressBar isVisible={isRegisterationStatusLoading} />
+        <IndeterminateProgressBar isVisible={isSigninStatusLoading} />
         <div className='px-8 py-12'>
           <form onSubmit={handleFormSubmit}>
-            <h2 className='text-lg font-semibold'>Vendor Registeration</h2>
+            <h2 className='text-lg font-semibold'>Vendor Sign In</h2>
             <ul>
               <FormErrorMsg isVisible={haveErrors}>
                 <p>
@@ -51,30 +48,14 @@ const VendorSignup = () => {
               <Input
                 disabled={allFormControlsDisabled}
                 onChange={handleFormValues}
-                value={fullname}
-                type='text'
-                htmlFor='fullname'
-                spellCheck={false}
-                name='fullname'
-                labelText='Full Name'
-                isInputError={isFullnameInputError}
-                errorMsg={fullnameInputErrorMsg}
-                placeholder='Enter full name ✏️'
-                onBlur={handleOnBlurEventOnFormInputFields}
-              />
-              <Input
-                disabled={allFormControlsDisabled}
-                onChange={handleFormValues}
                 value={email}
                 type='email'
-                labelSufixText=' (unique to each vendor)'
                 labelText='Email'
                 name='email'
                 htmlFor='email'
                 isInputError={isEmailInputError || isVendorConflictError}
                 errorMsg={emailInputErrorMsg}
                 placeholder='example@gmail.com 📧'
-                onBlur={handleOnBlurEventOnFormInputFields}
               />
               <div>
                 <Input
@@ -88,20 +69,7 @@ const VendorSignup = () => {
                   isInputError={isPasswordInputError}
                   errorMsg={passwordInputErrorMsg}
                   placeholder='your secret password 🫣'
-                  onBlur={handleOnBlurEventOnFormInputFields}
                 />
-                <ul className='flex flex-wrap text-gray-400 text-xs pt-4'>
-                  <div className='flex-auto [&>li]:pb-2'>
-                    <li>8 character minimum</li>
-                    <li>1 uppercase character</li>
-                    <li>1 special character</li>
-                  </div>
-                  <div className='flex-auto [&>li]:pb-2'>
-                    <li>1 lowercase letter</li>
-                    <li>1 number</li>
-                    <li>no spaces</li>
-                  </div>
-                </ul>
               </div>
             </div>
             {/* ----------------- form actions */}
@@ -111,7 +79,7 @@ const VendorSignup = () => {
                 type='submit'
                 className='flex items-center justify-center gap-x-3 disabled:opacity-60 disabled:cursor-not-allowed w-full font-semibold text-white bg-blue-500 hover:bg-blue-600 uppercase px-4 py-3  rounded-lg'
               >
-                Register {isRegisterationStatusLoading && <Spinner />}
+                Sign in {isSigninStatusLoading && <Spinner />}
               </button>
               {/* ------------ for testing purposes only  */}
               {isDefaultValuesBtnVisible && (
@@ -126,8 +94,8 @@ const VendorSignup = () => {
             </div>
           </form>
           <p className='text-center text-sm mt-4'>
-            Already have an account?<span> </span>
-            <Link to='/vendor/signin'>Sign In</Link>
+            Don't have an account?<span> </span>
+            <Link to='/vendor/register'>Create Account</Link>
           </p>
         </div>
       </div>
@@ -135,7 +103,7 @@ const VendorSignup = () => {
   );
 };
 
-export default VendorSignup;
+export default VendorSignin;
 
 // -------- FormErrorMsg
 

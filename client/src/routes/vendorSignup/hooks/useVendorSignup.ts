@@ -7,7 +7,6 @@ import { isProductionEnv } from '../../../utils/utils';
 import { registerVendor } from '../../../api/vendor';
 import { isAxiosError } from 'axios';
 import { UknownObject } from '../../../types/general';
-import { useNavigate } from 'react-router-dom';
 
 type FormStateFields = {
   fullname: string;
@@ -31,7 +30,6 @@ const initialFormState: FormState = {
 };
 
 const useVendorSignup = () => {
-  const navigate = useNavigate();
   const [formState, setFormState] = React.useState<FormState>(initialFormState);
   const { fullname, email, password, errors, touchedFieldList, registerationStatus } =
     formState;
@@ -44,9 +42,10 @@ const useVendorSignup = () => {
   const isPasswordInputError = 'password' in _errors;
   const passwordInputErrorMsg = _errors?.password || '';
   const isRegisterationStatusLoading = registerationStatus === 'loading';
+  const isRegisterationStatusSuccess = registerationStatus === 'success';
   const allFormControlsDisabled = isRegisterationStatusLoading;
   const isFormSubmitBtnDisabled = allFormControlsDisabled;
-  const isDefaultValuesBtnVisible = false && !isProductionEnv;
+  const isDefaultValuesBtnVisible = true && !isProductionEnv;
   const isVendorConflictError = 'isVendorConflictError' in _errors;
 
   const updateFormState = (newState: Partial<FormState>) => {
@@ -129,10 +128,9 @@ const useVendorSignup = () => {
         email,
         password,
       });
-      updateRegisterationStatus('success');
-      toast.success('Vendor successfully registered 🫣');
-      navigate('/vendor/signin', {
-        replace: true,
+      updateFormState({
+        ...initialFormState,
+        registerationStatus: 'success',
       });
     } catch (error) {
       updateRegisterationStatus('error');
@@ -168,7 +166,6 @@ const useVendorSignup = () => {
       passwordInputErrorMsg,
       isFormSubmitBtnDisabled,
       allFormControlsDisabled,
-      isRegisterationStatusLoading,
       isVendorConflictError,
     },
     formState: {
@@ -177,6 +174,8 @@ const useVendorSignup = () => {
       password,
       errors,
       enterTestValues,
+      isRegisterationStatusLoading,
+      isRegisterationStatusSuccess,
     },
     isDefaultValuesBtnVisible,
     handleFormValues,

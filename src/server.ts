@@ -17,7 +17,12 @@ const PORT = env.PORT || 3004;
 const app = express();
 
 // app middlewares
-app.use(cors());
+app.use(
+  cors({
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan('dev'));

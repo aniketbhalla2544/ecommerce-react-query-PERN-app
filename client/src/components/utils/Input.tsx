@@ -28,7 +28,7 @@ const Input = ({
     <div className='flex flex-col gap-y-3'>
       <label htmlFor={htmlFor}>
         {labelText.trim()}
-        <RequiredInputSymbol />
+        {otherProps.required && <RequiredInputSymbol />}
         <span className='text-xs text-gray-500'>{labelSufixText.trimEnd()}</span>
       </label>
       <input

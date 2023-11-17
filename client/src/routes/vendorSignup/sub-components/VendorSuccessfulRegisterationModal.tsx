@@ -23,7 +23,7 @@ const VendorSuccessfulRegisterationModal = ({ showModal }: ThisProps) => {
         <div className='px-10 py-8 bg-green-300 h-[200px] flex justify-center items-center'>
           <img
             src={clebImg}
-            alt=''
+            alt='celeberation-img'
             width={CELEBERATION_IMG_SIZE}
             height={CELEBERATION_IMG_SIZE}
           />

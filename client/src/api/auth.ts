@@ -1,21 +1,23 @@
 import { SigninVendor } from '../types/vendor';
-import { logger } from '../utils/logger';
 import { apiClient } from './config';
+
+// --- signinVendor
+type SigninVendorResponse = {
+  success: boolean;
+  vendorId: string;
+  vendorSlug: string;
+  loginAccessToken: string;
+};
 
 export const signinVendor = async (registerVendor: SigninVendor) => {
   const { email, password } = registerVendor;
   const encodedCredentials = btoa(`${email}:${password}`);
 
-  logger.log({
-    email,
-    password,
-    encodedCredentials,
-  });
-
-  await apiClient.post('/auth/signin', null, {
-    withCredentials: true,
+  // withCredentials: true,
+  const { data } = await apiClient.post<SigninVendorResponse>('/auth/signin', null, {
     headers: {
       Authorization: `Basic ${encodedCredentials}`,
     },
   });
+  return data;
 };

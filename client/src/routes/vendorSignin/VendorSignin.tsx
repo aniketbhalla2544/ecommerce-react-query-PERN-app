@@ -10,7 +10,6 @@ import useVendorSignin from './hooks/useVendorSignin';
 const VendorSignin = () => {
   const {
     validationState: {
-      haveErrors,
       isEmailInputError,
       emailInputErrorMsg,
       isPasswordInputError,
@@ -18,7 +17,7 @@ const VendorSignin = () => {
       isFormSubmitBtnDisabled,
       allFormControlsDisabled,
       isSigninStatusLoading,
-      isVendorConflictError,
+      invalidCredentialsError,
     },
     formState: { email, password, enterTestValues },
     isDefaultValuesBtnVisible,
@@ -34,13 +33,8 @@ const VendorSignin = () => {
           <form onSubmit={handleFormSubmit}>
             <h2 className='text-lg font-semibold'>Vendor Sign In</h2>
             <ul>
-              <FormErrorMsg isVisible={haveErrors}>
-                <p>
-                  Please review your entries. Some information is missing or incorrect.
-                </p>
-              </FormErrorMsg>
-              <FormErrorMsg isVisible={isVendorConflictError}>
-                <p>Vendor with email {email} already exists.</p>
+              <FormErrorMsg isVisible={invalidCredentialsError}>
+                <p>Incorrect email or password.</p>
               </FormErrorMsg>
             </ul>
             {/* ----------- form controls */}
@@ -53,7 +47,7 @@ const VendorSignin = () => {
                 labelText='Email'
                 name='email'
                 htmlFor='email'
-                isInputError={isEmailInputError || isVendorConflictError}
+                isInputError={isEmailInputError}
                 errorMsg={emailInputErrorMsg}
                 placeholder='example@gmail.com 📧'
               />

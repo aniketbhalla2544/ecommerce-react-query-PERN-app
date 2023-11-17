@@ -39,8 +39,8 @@ const useVendorSignin = () => {
   const isSigninStatusLoading = signinStatus === 'loading';
   const allFormControlsDisabled = isSigninStatusLoading;
   const isFormSubmitBtnDisabled = allFormControlsDisabled;
-  const isDefaultValuesBtnVisible = false && !isProductionEnv;
-  const isVendorConflictError = 'isVendorConflictError' in _errors;
+  const isDefaultValuesBtnVisible = true && !isProductionEnv;
+  const invalidCredentialsError = 'invalidCredentials' in _errors;
 
   const updateFormState = (newState: Partial<FormState>) => {
     setFormState((oldVal) => ({
@@ -86,8 +86,12 @@ const useVendorSignin = () => {
       toast.error('Unable to sign in 🫢');
       const issues = getZodValidationIssues(error);
       if (issues) {
+        logger.log('Invalid type credentials, zod validation issues: ', issues);
         updateFormState({
-          errors: issues,
+          password: '',
+          errors: {
+            invalidCredentials: true,
+          },
         });
       }
     }
@@ -100,28 +104,40 @@ const useVendorSignin = () => {
       if (!validatedFormValues) return;
       const { email, password } = validatedFormValues;
       updateSigninStatus('loading');
-      await signinVendor({
+      const { vendorId } = await signinVendor({
         email,
         password,
       });
       updateSigninStatus('success');
       toast.success('Vendor loggedin successfully 🫣');
-      navigate('/vendor/signin');
+      navigate(`/vendor/${vendorId}/dashboard`, {
+        replace: true,
+      });
     } catch (error) {
       updateSigninStatus('error');
-      toast.error('Unable to create account 🫢');
+      toast.error('Error while signing in 🫢');
       logger.error(error);
       if (isAxiosError(error)) {
         const response = error?.response ?? {};
         if ('data' in response) {
           const responseData = response.data as UknownObject;
           logger.log({ responseData });
-          if ('isVendorConflictError' in responseData) {
-            logger.error('Vendor conflict error');
+          // ✅
+          if ('authHeaderNotFound' in responseData) {
+            logger.error('authorization header not found while signing in');
             updateFormState({
+              password: '',
+            });
+          }
+          // ✅
+          if (
+            'invalidTypeCredentials' in responseData ||
+            'invalidCredentials' in responseData
+          ) {
+            updateFormState({
+              password: '',
               errors: {
-                ..._errors,
-                isVendorConflictError: true,
+                invalidCredentials: true,
               },
             });
           }
@@ -144,7 +160,7 @@ const useVendorSignin = () => {
       isFormSubmitBtnDisabled,
       allFormControlsDisabled,
       isSigninStatusLoading,
-      isVendorConflictError,
+      invalidCredentialsError,
     },
     formState: {
       email,

@@ -2,33 +2,33 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 import createHttpError from 'http-errors';
 import { getOffset } from '../../db/queryHelpers';
-import { USER_ID, pgquery } from '../../../db';
+import { pgquery } from '../../../db';
+import { getLoggedInVendorId } from '../../../middlewares/checkVendorAuthorization';
 
 async function getProduct(req: Request, res: Response) {
-  const userId = USER_ID;
+  const vendorId = getLoggedInVendorId(res);
   const productId = Number(req.params.id.trim());
 
   const getProductQueryResult = await pgquery({
-    text: `SELECT product_id, user_id, title, price, description, image FROM products 
-          WHERE user_id = $1 AND is_archived = false AND product_id = $2`,
-    values: [userId, productId],
+    text: `SELECT product_id, vendor_id, title, price, description, image FROM products 
+          WHERE vendor_id = $1 AND is_archived = false AND product_id = $2`,
+    values: [vendorId, productId],
   });
   const { rowCount, rows } = getProductQueryResult;
-
-  if (!rowCount) {
+  if (!rowCount || !rows.length) {
     throw createHttpError(404, 'Product not found', {
       productId,
     });
   }
 
   return res.json({
-    success: !!rowCount,
+    success: !!rowCount && !!rows.length,
     data: rows[0],
   });
 }
 
 async function getProducts(req: Request, res: Response) {
-  const userId = USER_ID;
+  const vendorId = getLoggedInVendorId(res);
 
   // ✔️ page, limit, offset
   const DEFAULT_PAGE = 1;
@@ -39,11 +39,11 @@ async function getProducts(req: Request, res: Response) {
 
   // selects undeleted products for user_id = 1 sorted by created_at in descending order
   const sortedProductsQuery = pgquery({
-    text: `SELECT product_id, user_id, title, price, description, image FROM products 
-          WHERE user_id = $1 AND is_archived = false
+    text: `SELECT product_id, vendor_id, title, price, description, image FROM products 
+          WHERE vendor_id = $1 AND is_archived = false
           ORDER BY created_at DESC
           LIMIT $2 OFFSET $3;`,
-    values: [userId, limit, offset],
+    values: [vendorId, limit, offset],
   });
 
   // calculates total product pages with given limit and conditionally fetched products
@@ -51,9 +51,9 @@ async function getProducts(req: Request, res: Response) {
     text: `SELECT CEIL(COUNT(*)::DECIMAL/$1::DECIMAL) AS total_pages 
           FROM (
                 SELECT product_id FROM products
-                WHERE user_id = $2 AND is_archived = false
+                WHERE vendor_id = $2 AND is_archived = false
                 ) AS products;`,
-    values: [limit, userId],
+    values: [limit, vendorId],
   });
   const responses = await Promise.all([sortedProductsQuery, totalProductPagesQuery]);
   const [sortedProductsQueryResponse, totalProductPagesQueryResponse] = responses;
@@ -62,7 +62,7 @@ async function getProducts(req: Request, res: Response) {
     Math.abs(Number(totalProductPagesQueryResponse.rows[0]['total_pages'])) || 0;
 
   return res.json({
-    success: !!(totalProductPages && productsCount),
+    success: !!totalProductPages && !!productsCount,
     meta: {
       productsCount,
       offset,
@@ -75,7 +75,7 @@ async function getProducts(req: Request, res: Response) {
 }
 
 async function createProduct(req: Request, res: Response) {
-  const userId = USER_ID;
+  const vendorId = getLoggedInVendorId(res);
   // const uploadedImgPublicId = res.locals?.uploadedImgDetails.public_id ?? null;
 
   const newProduct = {
@@ -84,8 +84,6 @@ async function createProduct(req: Request, res: Response) {
     price: +req.body.price,
     imageURL: res.locals?.uploadedImgDetails?.secure_url || null,
   };
-
-  console.log({ newProduct });
 
   // ✅ product type validation
   const ProductSchema = z.object({
@@ -96,38 +94,36 @@ async function createProduct(req: Request, res: Response) {
   });
   const validatedNewProduct = ProductSchema.parse(newProduct);
 
-  console.log({
-    validatedNewProduct,
-  });
-
   const response = await pgquery({
-    text: `INSERT INTO products (user_id, title, price, description, image) 
+    text: `INSERT INTO products (vendor_id, title, price, description, image) 
     VALUES ($1, $2, $3, $4, $5)
     RETURNING title, price, description, image`,
     values: [
-      userId,
+      vendorId,
       validatedNewProduct.title,
       validatedNewProduct.price,
       validatedNewProduct.description,
       validatedNewProduct.imageURL,
     ],
   });
+  const insertedProduct = response.rows[0];
+
   return res.json({
-    success: true,
+    success: !!insertedProduct,
     msg: 'Product successfully created',
-    createdProduct: response.rows[0],
+    createdProduct: insertedProduct,
   });
 }
 
 async function deleteProduct(req: Request, res: Response) {
-  const userId = USER_ID;
+  const vendorId = getLoggedInVendorId(res);
   const productId = Number(req.params.id.trim());
 
   const result = await pgquery({
     text: `UPDATE products 
     SET is_archived = true
-    WHERE product_id = $1 AND is_archived = FALSE AND user_id = $2`,
-    values: [productId, userId],
+    WHERE product_id = $1 AND is_archived = FALSE AND vendor_id = $2`,
+    values: [productId, vendorId],
   });
   const { rowCount: totalDeletedRows } = result;
 
@@ -145,7 +141,7 @@ async function deleteProduct(req: Request, res: Response) {
 }
 
 async function updateProduct(req: Request, res: Response) {
-  const userId = USER_ID;
+  const vendorId = getLoggedInVendorId(res);
   const productId = Number(req.params.id.trim());
   const reqBody = req.body;
 
@@ -155,10 +151,6 @@ async function updateProduct(req: Request, res: Response) {
     price: +reqBody.price,
     image: res.locals?.uploadedImgDetails?.secure_url || reqBody.imageURL || null,
   };
-
-  console.log({
-    updatedProduct,
-  });
 
   // validate the req body
   const ProductSchema = z.object({
@@ -173,8 +165,8 @@ async function updateProduct(req: Request, res: Response) {
   const updateQueryResponse = await pgquery({
     text: `UPDATE products 
     SET image = $1, price = $2, title = $3, description = $4
-    WHERE product_id = $5 AND is_archived = false AND user_id = $6;`,
-    values: [image, price, title, description, productId, userId],
+    WHERE product_id = $5 AND is_archived = false AND vendor_id = $6;`,
+    values: [image, price, title, description, productId, vendorId],
   });
   const { rowCount } = updateQueryResponse;
 

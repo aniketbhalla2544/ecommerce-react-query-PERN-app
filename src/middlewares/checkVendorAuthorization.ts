@@ -108,8 +108,8 @@ async function validateDecodedVendor(vendor: unknown): Promise<ValidDecodedVendo
 
 //  ----------- utils
 // const vendorId = getLoggedInVendorId(res);
-export function getLoggedInVendorId(res: Response): number {
-  const loggedInVendorId = res.locals.vendor['vendor_id'];
+export function getLoggedInVendorId(res: Response) {
+  const loggedInVendorId = res.locals.vendor['vendor_id'] as Vendor['vendor_id'];
   if (!+loggedInVendorId) {
     console.log(
       `Error getLoggedInVendorId(): vendor id not found, current vendor id: `,

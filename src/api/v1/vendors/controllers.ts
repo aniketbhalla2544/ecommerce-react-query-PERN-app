@@ -4,6 +4,7 @@ import { ValidatedRegisteredVendor } from './validations/vendorRegisterationData
 import { pgquery } from '../../../db';
 import { vendorServices } from './services';
 import { Vendor } from '../../../types/vendor';
+import { getLoggedInVendorId } from '../../../middlewares/checkVendorAuthorization';
 
 async function registerVendor(req: Request, res: Response) {
   const validatedRegisteredVendor = res.locals.validatedRegisteredVendor as
@@ -41,7 +42,7 @@ async function registerVendor(req: Request, res: Response) {
 }
 
 async function getVendor(req: Request, res: Response) {
-  const { vendor_id: vendorId } = res.locals.vendor as Vendor;
+  const vendorId = getLoggedInVendorId(res);
   const requestResponse = await vendorServices.getVendor('vendor_id', vendorId);
   const { rowCount, rows } = requestResponse;
   const vendor = rows[0] as Vendor;

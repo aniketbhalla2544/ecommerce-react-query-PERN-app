@@ -9,26 +9,30 @@ import Dashboard from './routes/Dashboard';
 import VendorSignup from './routes/vendorSignup/VendorSignup';
 import VendorSignin from './routes/vendorSignin/VendorSignin';
 
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <Root />,
-    children: [
-      {
-        path: '/dashboard',
-        element: <Dashboard />,
-      },
-    ],
-  },
-  {
-    path: '/vendor/register',
-    element: <VendorSignup />,
-  },
-  {
-    path: '/vendor/signin',
-    element: <VendorSignin />,
-  },
-]);
+export const router = createBrowserRouter(
+  [
+    {
+      path: '/register',
+      element: <VendorSignup />,
+    },
+    {
+      path: '/signin',
+      element: <VendorSignin />,
+    },
+
+    {
+      path: '/vendor',
+      element: <Root />,
+      children: [
+        {
+          path: '/vendor/dashboard',
+          element: <Dashboard />,
+        },
+      ],
+    },
+  ],
+  {}
+);
 
 const queryClient = new QueryClient();
 

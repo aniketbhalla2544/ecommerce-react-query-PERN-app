@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import createHttpError from 'http-errors';
 import { ValidatedRegisteredVendor } from './validations/vendorRegisterationDataValidationSchema';
 import { pgquery } from '../../../db';
+import { vendorServices } from './services';
+import { Vendor } from '../../../types/vendor';
 
 async function registerVendor(req: Request, res: Response) {
   const validatedRegisteredVendor = res.locals.validatedRegisteredVendor as
@@ -38,6 +40,25 @@ async function registerVendor(req: Request, res: Response) {
   });
 }
 
+async function getVendor(req: Request, res: Response) {
+  const { vendor_id: vendorId } = res.locals.vendor as Vendor;
+  const requestResponse = await vendorServices.getVendor('vendor_id', vendorId);
+  const { rowCount, rows } = requestResponse;
+  const vendor = rows[0] as Vendor;
+
+  res.json({
+    success: !!rowCount && !!rows.length,
+    data: {
+      email: vendor.email,
+      fullname: vendor.fullname,
+      isPremium: vendor.is_premium,
+      vendorId: String(vendor.vendor_id),
+      vendorSlug: vendor.vendor_slug,
+    },
+  });
+}
+
 export const vendorControllersV1 = {
   registerVendor,
+  getVendor,
 };

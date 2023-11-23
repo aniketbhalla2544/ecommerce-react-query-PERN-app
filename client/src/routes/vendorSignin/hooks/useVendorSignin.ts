@@ -8,6 +8,9 @@ import { UknownObject } from '../../../types/general';
 import { useNavigate } from 'react-router-dom';
 import vendorSigninFormZodValidationSchema from '../vendorSigninFormZodValidationSchema';
 import { signinVendor } from '../../../api/auth';
+import { getVendor } from '../../../api/vendor';
+import useAppStore from '../../../stores/zustand/appStore';
+import appRoutes from '../../../utils/app.routes';
 
 type FormStateFields = {
   email: string;
@@ -27,6 +30,13 @@ const initialFormState: FormState = {
 };
 
 const useVendorSignin = () => {
+  const { accessToken, setAccessToken, vendor, setVendor } = useAppStore((state) => ({
+    vendor: state.vendor,
+    setVendor: state.setVendor,
+    accessToken: state.accessToken,
+    setAccessToken: state.setAccessToken,
+  }));
+  const vendorId = vendor.vendorId;
   const navigate = useNavigate();
   const [formState, setFormState] = React.useState<FormState>(initialFormState);
   const { email, password, errors, signinStatus } = formState;
@@ -104,15 +114,15 @@ const useVendorSignin = () => {
       if (!validatedFormValues) return;
       const { email, password } = validatedFormValues;
       updateSigninStatus('loading');
-      const { vendorId } = await signinVendor({
+      const { loginAccessToken } = await signinVendor({
         email,
         password,
       });
+      setAccessToken(loginAccessToken);
+      const vendor = await getVendor();
+      setVendor(vendor);
       updateSigninStatus('success');
       toast.success('Vendor loggedin successfully 🫣');
-      navigate(`/vendor/${vendorId}/dashboard`, {
-        replace: true,
-      });
     } catch (error) {
       updateSigninStatus('error');
       toast.error('Error while signing in 🫢');
@@ -147,8 +157,18 @@ const useVendorSignin = () => {
   };
 
   React.useEffect(() => {
-    logger.log(errors);
-  });
+    if (accessToken && vendorId) {
+      navigate(appRoutes.VENDOR_DASHBOARD, {
+        replace: true,
+      });
+    }
+  }, [accessToken, vendorId, navigate]);
+
+  React.useEffect(() => {
+    console.log({
+      errors,
+    });
+  }, [errors]);
 
   return {
     validationState: {

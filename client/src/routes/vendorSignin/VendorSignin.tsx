@@ -4,6 +4,7 @@ import Spinner from '../../components/utils/Spinner';
 import IndeterminateProgressBar from '../../components/utils/IndeterminateProgressBar';
 import { Link } from 'react-router-dom';
 import useVendorSignin from './hooks/useVendorSignin';
+import appRoutes from '../../utils/app.routes';
 
 // TODO: add show password icon to password input
 
@@ -89,7 +90,7 @@ const VendorSignin = () => {
           </form>
           <p className='text-center text-sm mt-4'>
             Don't have an account?<span> </span>
-            <Link to='/vendor/register'>Create Account</Link>
+            <Link to={appRoutes.REGISTER}>Create Account</Link>
           </p>
         </div>
       </div>

@@ -10,7 +10,7 @@ export const INVALID_ROUTE_MSG = 'Request to invalid route';
 const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunction) => {
   // ✔️ catching 'http-errors' package generated errors
   if (isHttpError(err)) {
-    const exposedToClient = err.expose;
+    const exposedToClient = err.expose; // by default expose is true
     if (exposedToClient) {
       const status = err.statusCode ?? err.status ?? 500;
       const message = err.message;

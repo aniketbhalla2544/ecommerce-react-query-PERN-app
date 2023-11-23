@@ -7,22 +7,29 @@ import { vendorServices } from '../vendors/services';
 import { Vendor } from '../../../types/vendor';
 import jwt from 'jsonwebtoken';
 import { isProductionEnv } from '../../../utils/helpers';
+import appConfig from '../../../config/appConfig';
 
-const env = process.env;
 const MINS_10 = 1000 * 60 * 10;
-const LOGIN_REFRESH_TOKEN_COOKIE_NAME = 'login-refresh';
+const refreshAccessTokenCookieName = appConfig.vendor.login.refreshAccessToken.cookieName;
 
 async function signinVendor(req: Request, res: Response) {
   const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    console.log('Error signinVendor: authorization header not found');
-    throw createHttpError(401, 'Unauthorized request', {
-      authHeaderNotFound: true,
-    });
+  const doesAuthHeaderhasBasicKeyword = !!authHeader?.includes('Basic');
+  const encodedCredentials = authHeader?.split(' ')[1];
+
+  // ✅ validating basic Authorization header
+  if (
+    !authHeader ||
+    !doesAuthHeaderhasBasicKeyword ||
+    !encodedCredentials ||
+    !(encodedCredentials?.length ?? 0)
+  ) {
+    console.log('Error signinVendor: Invalid authorization header, header: ', authHeader);
+    throw createHttpError(401, 'Unauthorized request');
   }
+
   try {
     // ✅ validating login credentials
-    const encodedCredentials = authHeader.split(' ')[1];
     const decodedCredentials = atob(encodedCredentials).split(':');
     const [email, password] = decodedCredentials;
 
@@ -36,11 +43,6 @@ async function signinVendor(req: Request, res: Response) {
     });
     const { email: validatedEmail, password: validatedPassword } = validatedCredentials;
 
-    console.log({
-      validatedEmail,
-      validatedPassword,
-    });
-
     // ✅ for existing vendor with the email
     const queryResponse = await vendorServices.getVendor('email', validatedEmail);
     const { rowCount, rows } = queryResponse;
@@ -48,7 +50,7 @@ async function signinVendor(req: Request, res: Response) {
       console.log(
         `Error signinVendor: no existing vendor with email ${validatedEmail} found in the records.`
       );
-      throw createHttpError(401, 'Unauthorized request', {
+      throw createHttpError(400, 'Invalid credentials', {
         invalidCredentials: true,
       });
     }
@@ -67,10 +69,12 @@ async function signinVendor(req: Request, res: Response) {
     }
 
     // ☑️ creating and setting jwt login refresh token
-    const loginRefreshTokenSecretKey = env.VENDOR_LOGIN_REFRESH_TOKEN_SECRET_KEY;
-    if (!loginRefreshTokenSecretKey) {
+    const loginRefreshAccessTokenSecretKey =
+      appConfig.vendor.login.refreshAccessToken.secretKey;
+    appConfig.vendor.login;
+    if (!loginRefreshAccessTokenSecretKey) {
       console.log(
-        'Error signinVendor: loginRefreshTokenSecretKey not found while signing in vendor'
+        'Error signinVendor: loginRefreshAccessTokenSecretKey not found while signing in vendor'
       );
       throw createHttpError(500, 'Error while signing in');
     }
@@ -80,19 +84,20 @@ async function signinVendor(req: Request, res: Response) {
         email: vendor.email,
         slug: vendor.vendor_slug,
       },
-      loginRefreshTokenSecretKey,
+      loginRefreshAccessTokenSecretKey,
       {
         expiresIn: '7d',
       }
     );
-    res.cookie(LOGIN_REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
+
+    res.cookie(refreshAccessTokenCookieName, refreshToken, {
       httpOnly: true,
       secure: isProductionEnv,
       maxAge: MINS_10,
     });
 
     // ☑️ creating jwt login access token
-    const loginAccessTokenSecretKey = env.VENDOR_LOGIN_ACCESS_TOKEN_SECRET_KEY;
+    const loginAccessTokenSecretKey = appConfig.vendor.login.accessToken.secretKey;
     if (!loginAccessTokenSecretKey) {
       console.log(
         'Error signinVendor: loginAccessTokenSecretKey not found while signing in vendor'
@@ -113,13 +118,11 @@ async function signinVendor(req: Request, res: Response) {
 
     res.json({
       success: !!rowCount && passwordMatched && !!vendor,
-      vendorId: vendor.vendor_id,
-      vendorSlug: vendor.vendor_slug,
       loginAccessToken,
     });
   } catch (e) {
     // ☑️ removing http only cookie
-    res.clearCookie(LOGIN_REFRESH_TOKEN_COOKIE_NAME);
+    res.clearCookie(refreshAccessTokenCookieName);
 
     // catching zod validation errors
     if (isZodError(e)) {
@@ -131,12 +134,16 @@ async function signinVendor(req: Request, res: Response) {
       throw createHttpError(400, 'Invalid type credentials', {
         invalidTypeCredentials: true,
       });
-    } else {
-      throw e;
     }
+    throw e;
   }
+}
+
+async function signoutVendor(req: Request, res: Response) {
+  res.send('done');
 }
 
 export const authControllersV1 = {
   signinVendor,
+  signoutVendor,
 };

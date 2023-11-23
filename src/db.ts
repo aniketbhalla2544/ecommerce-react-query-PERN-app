@@ -43,5 +43,3 @@ export async function pgquery({ text, values }: QueryConfig) {
     values,
   });
 }
-
-export const USER_ID = 1;

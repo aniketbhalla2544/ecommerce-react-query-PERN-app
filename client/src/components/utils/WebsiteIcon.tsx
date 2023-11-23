@@ -4,12 +4,12 @@ type ThisProps = {
   textSize?: string;
 };
 
-const WebsiteIcon = ({ textSize = 'text-3xl' }: ThisProps) => {
+const WebsiteIcon = ({ textSize = 'text-2xl' }: ThisProps) => {
   return (
     <h1
-      className={`flex items-center gap-x-2 flex-wrap text-2xl ${textSize} font-bold text-blue-500`}
+      className={`flex items-center gap-x-2 flex-wrap ${textSize} font-bold text-blue-500`}
     >
-      Vendor Dashboard
+      EcomVendorWeb
       <span>
         <FaOpencart />
       </span>

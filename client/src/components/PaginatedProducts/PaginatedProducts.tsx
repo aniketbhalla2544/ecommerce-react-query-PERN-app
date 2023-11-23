@@ -56,7 +56,7 @@ const PaginatedProducts = () => {
 
   return (
     <>
-      <div>
+      <div className='py-24'>
         <UpperControlBoard updatePage={updatePage} />
         <ul className='h-[324px] overflow-auto'>
           {products.map((product) => (

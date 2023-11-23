@@ -1,6 +1,6 @@
 import { MutationProduct } from '../components/PaginatedProducts/sub-components/CreateProductModal';
 import { Product, Products } from '../types/products';
-import { apiClient } from './config';
+import { apiClient } from './api.config';
 
 // ---------- fetchProducts
 type FetchProductsQueryResponse = {

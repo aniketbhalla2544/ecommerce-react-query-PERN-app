@@ -1,10 +1,13 @@
 import PaginatedProducts from '../components/PaginatedProducts/PaginatedProducts';
+import Container from '../components/utils/Container';
 
 const Dashboard = () => {
   return (
-    <div className='py-20'>
-      <PaginatedProducts />
-    </div>
+    <Container>
+      <div>
+        <PaginatedProducts />
+      </div>
+    </Container>
   );
 };
 

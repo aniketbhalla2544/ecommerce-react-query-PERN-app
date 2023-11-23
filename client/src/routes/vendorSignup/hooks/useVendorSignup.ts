@@ -31,8 +31,7 @@ const initialFormState: FormState = {
 
 const useVendorSignup = () => {
   const [formState, setFormState] = React.useState<FormState>(initialFormState);
-  const { fullname, email, password, errors, touchedFieldList, registerationStatus } =
-    formState;
+  const { fullname, email, password, errors, registerationStatus } = formState;
   const haveErrors = !!errors;
   const _errors = errors ?? {};
   const isFullnameInputError = 'fullname' in _errors;
@@ -45,7 +44,7 @@ const useVendorSignup = () => {
   const isRegisterationStatusSuccess = registerationStatus === 'success';
   const allFormControlsDisabled = isRegisterationStatusLoading;
   const isFormSubmitBtnDisabled = allFormControlsDisabled;
-  const isDefaultValuesBtnVisible = true && !isProductionEnv;
+  const isDefaultValuesBtnVisible = false && !isProductionEnv;
   const isVendorConflictError = 'isVendorConflictError' in _errors;
 
   const updateFormState = (newState: Partial<FormState>) => {
@@ -67,22 +66,6 @@ const useVendorSignup = () => {
   const updateRegisterationStatus = (status: FormState['registerationStatus']) => {
     updateFormState({
       registerationStatus: status,
-    });
-  };
-
-  // NOTE: functionality not required but shouldn't be deleted
-  const handleOnBlurEventOnFormInputFields = (
-    e: React.FocusEvent<HTMLInputElement, Element>
-  ) => {
-    e.preventDefault();
-    return;
-    const interactedFieldName = e.target.name.trim() as keyof FormStateFields;
-    const isInteractedFieldNameInTouchedFieldList =
-      touchedFieldList.includes(interactedFieldName);
-    if (isInteractedFieldNameInTouchedFieldList) return;
-
-    updateFormState({
-      touchedFieldList: [...formState.touchedFieldList, interactedFieldName],
     });
   };
 
@@ -144,8 +127,8 @@ const useVendorSignup = () => {
           if ('isVendorConflictError' in responseData) {
             logger.error('Vendor conflict error');
             updateFormState({
+              password: '',
               errors: {
-                ..._errors,
                 isVendorConflictError: true,
               },
             });
@@ -180,8 +163,23 @@ const useVendorSignup = () => {
     isDefaultValuesBtnVisible,
     handleFormValues,
     handleFormSubmit,
-    handleOnBlurEventOnFormInputFields,
   };
 };
 
 export default useVendorSignup;
+
+// NOTE: functionality not required but shouldn't be deleted
+//  const handleOnBlurEventOnFormInputFields = (
+//   e: React.FocusEvent<HTMLInputElement, Element>
+// ) => {
+//   e.preventDefault();
+//   return;
+//   const interactedFieldName = e.target.name.trim() as keyof FormStateFields;
+//   const isInteractedFieldNameInTouchedFieldList =
+//     touchedFieldList.includes(interactedFieldName);
+//   if (isInteractedFieldNameInTouchedFieldList) return;
+
+//   updateFormState({
+//     touchedFieldList: [...formState.touchedFieldList, interactedFieldName],
+//   });
+// };

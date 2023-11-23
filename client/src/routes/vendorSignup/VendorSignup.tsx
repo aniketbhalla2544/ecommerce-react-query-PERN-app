@@ -5,6 +5,7 @@ import Spinner from '../../components/utils/Spinner';
 import IndeterminateProgressBar from '../../components/utils/IndeterminateProgressBar';
 import { Link } from 'react-router-dom';
 import VendorSuccessfulRegisterationModal from './sub-components/VendorSuccessfulRegisterationModal';
+import appRoutes from '../../utils/app.routes';
 
 // TODO: add show password icon to password input
 
@@ -33,7 +34,6 @@ const VendorSignup = () => {
     isDefaultValuesBtnVisible,
     handleFormValues,
     handleFormSubmit,
-    handleOnBlurEventOnFormInputFields,
   } = useVendorSignup();
 
   return (
@@ -51,7 +51,12 @@ const VendorSignup = () => {
                   </p>
                 </FormErrorMsg>
                 <FormErrorMsg isVisible={isVendorConflictError}>
-                  <p>Vendor with email {email} already exists.</p>
+                  <p>
+                    Vendor with email {email} already exists. Please consider{' '}
+                    <Link to={appRoutes.SIGNIN} replace>
+                      signing in
+                    </Link>
+                  </p>
                 </FormErrorMsg>
               </ul>
               {/* ----------- form controls */}
@@ -68,7 +73,6 @@ const VendorSignup = () => {
                   isInputError={isFullnameInputError}
                   errorMsg={fullnameInputErrorMsg}
                   placeholder='Enter full name ✏️'
-                  onBlur={handleOnBlurEventOnFormInputFields}
                 />
                 <Input
                   disabled={allFormControlsDisabled}
@@ -82,7 +86,6 @@ const VendorSignup = () => {
                   isInputError={isEmailInputError || isVendorConflictError}
                   errorMsg={emailInputErrorMsg}
                   placeholder='example@gmail.com 📧'
-                  onBlur={handleOnBlurEventOnFormInputFields}
                 />
                 <div>
                   <Input
@@ -96,7 +99,6 @@ const VendorSignup = () => {
                     isInputError={isPasswordInputError}
                     errorMsg={passwordInputErrorMsg}
                     placeholder='your secret password 🫣'
-                    onBlur={handleOnBlurEventOnFormInputFields}
                   />
                   <ul className='flex flex-wrap text-gray-400 text-xs pt-4'>
                     <div className='flex-auto [&>li]:pb-2'>
@@ -135,7 +137,7 @@ const VendorSignup = () => {
             </form>
             <p className='text-center text-sm mt-4'>
               Already have an account?<span> </span>
-              <Link to='/vendor/signin'>Sign In</Link>
+              <Link to={appRoutes.SIGNIN}>Sign In</Link>
             </p>
           </div>
         </div>

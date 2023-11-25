@@ -1,10 +1,9 @@
 import axios, { AxiosError } from 'axios';
 import useAppStore from '../stores/zustand/appStore';
-import { router } from '../main';
+import { logger } from '../utils/logger';
+import { resetAppState } from '../utils/auth.utils';
 import { isProductionEnv } from '../utils/utils';
 import toast from 'react-hot-toast';
-import appRoutes from '../utils/app.routes';
-import { logger } from '../utils/logger';
 
 const apiConfig = {
   baseURL: '/api/vendor/v1',
@@ -39,8 +38,7 @@ apiClient.interceptors.response.use(
       // anauthorized access error
       if (status === 401) {
         !isProductionEnv && toast.error('Unauthorized access ✋🚫');
-        useAppStore.getState().resetAppState();
-        router.navigate(appRoutes.SIGNIN);
+        resetAppState();
       }
     }
     return Promise.reject(error);

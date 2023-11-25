@@ -1,37 +1,35 @@
 import React from 'react';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-// import useAppStore from '../../../stores/zustand/appStore';
 import appRoutes from '../../../utils/app.routes';
 import ConditionalRender from '../../utils/ConditionalRender';
 import useOnClickOutside from 'use-onclickoutside';
 import useAppStore from '../../../stores/zustand/appStore';
-import { useQueryClient } from '@tanstack/react-query';
+import { signoutVendor } from '../../../api/auth';
+import { resetAppState } from '../../../utils/auth.utils';
 
 const VENDOR_PROFILE_IMG_URL =
   'https://res.cloudinary.com/dlgcmw9tb/image/upload/v1700667250/eqcozozbuqruzzjdsls8.jpg';
 
 const VendorProfile = () => {
-  const { resetAppState, vendorName, vendorEmail } = useAppStore((state) => ({
-    resetAppState: state.resetAppState,
+  const { vendorName, vendorEmail } = useAppStore((state) => ({
     vendorName: state.vendor.fullname.trim(),
     vendorEmail: state.vendor.email,
   }));
-  const navigate = useNavigate();
   const [showActionPopover, setShowActionPopover] = React.useState(false);
   const elementRef = React.useRef<HTMLDivElement | null>(null);
   useOnClickOutside(elementRef, () => setShowActionPopover(false));
-  const queryClient = useQueryClient();
 
   const handleImgClick = () => setShowActionPopover(!showActionPopover);
 
-  const handleLogoutBtnClick = () => {
-    queryClient.removeQueries({
-      type: 'all',
-    });
-    resetAppState();
-    navigate(appRoutes.SIGNIN, {
-      replace: true,
-    });
+  const handleLogoutBtnClick = async () => {
+    try {
+      await signoutVendor();
+    } catch (error) {
+      toast.error('error while signing out');
+    } finally {
+      resetAppState();
+    }
   };
 
   return (
@@ -54,8 +52,8 @@ const VendorProfile = () => {
             </div>
           </div>
           <ul className='capitalize flex flex-col gap-y-2 text-sm py-4 items-stretch'>
-            <NavLink path={appRoutes.VENDOR_DASHBOARD}>update profile</NavLink>
-            <NavLink path={appRoutes.VENDOR_DASHBOARD}>my products</NavLink>
+            <NavLink path={appRoutes.dashboard.DASHBOARD}>update profile</NavLink>
+            <NavLink path={appRoutes.dashboard.DASHBOARD}>my products</NavLink>
             <hr />
             <li>
               <button

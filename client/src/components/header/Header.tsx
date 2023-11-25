@@ -21,7 +21,7 @@ const navItems = [
     protected: true,
   },
   {
-    path: appRoutes.VENDOR_DASHBOARD,
+    path: appRoutes.dashboard.DASHBOARD,
     text: 'dashboard',
     protected: true,
   },
@@ -31,7 +31,7 @@ const Header = () => {
   const { isVendorLoggedIn } = useAuth();
   return (
     <Container>
-      <div className='py-8 flex justify-between items-center'>
+      <div className='py-6 flex justify-between items-center'>
         <WebsiteIcon />
         {/* navigation items */}
         <div className=''>

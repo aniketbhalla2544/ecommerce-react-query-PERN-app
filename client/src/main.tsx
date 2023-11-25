@@ -5,9 +5,10 @@ import ReactDOM from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import Root from './routes/Root';
-import Dashboard from './routes/Dashboard';
 import VendorSignup from './routes/vendorSignup/VendorSignup';
 import VendorSignin from './routes/vendorSignin/VendorSignin';
+import DashboardPage from './routes/DashboardPage';
+import DashboardProducts from './components/dashboard/dashboardProducts/DashboardProducts';
 
 export const router = createBrowserRouter(
   [
@@ -19,22 +20,31 @@ export const router = createBrowserRouter(
       path: '/signin',
       element: <VendorSignin />,
     },
-
+    {
+      path: '/vendor/dashboard',
+      element: <DashboardPage />,
+      children: [
+        {
+          path: 'products',
+          element: <DashboardProducts />,
+        },
+      ],
+    },
     {
       path: '/vendor',
       element: <Root />,
       children: [
-        {
-          path: '/vendor/dashboard',
-          element: <Dashboard />,
-        },
+        // {
+        //   path: 'paginated-products',
+        //   element: <PaginatedProducts />,
+        // },
       ],
     },
   ],
   {}
 );
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

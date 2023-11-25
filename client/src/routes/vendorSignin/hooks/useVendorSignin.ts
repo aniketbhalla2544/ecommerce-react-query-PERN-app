@@ -158,7 +158,7 @@ const useVendorSignin = () => {
 
   React.useEffect(() => {
     if (accessToken && vendorId) {
-      navigate(appRoutes.VENDOR_DASHBOARD, {
+      navigate(appRoutes.dashboard.PRODUCTS, {
         replace: true,
       });
     }

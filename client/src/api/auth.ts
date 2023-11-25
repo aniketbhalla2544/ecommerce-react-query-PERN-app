@@ -17,3 +17,7 @@ export const signinVendor = async (registerVendor: SigninVendor) => {
   });
   return data;
 };
+
+export const signoutVendor = async () => {
+  await apiClient.post('/auth/signout');
+};

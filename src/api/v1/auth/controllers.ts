@@ -140,7 +140,8 @@ async function signinVendor(req: Request, res: Response) {
 }
 
 async function signoutVendor(req: Request, res: Response) {
-  res.send('done');
+  res.clearCookie(refreshAccessTokenCookieName);
+  res.sendStatus(202);
 }
 
 export const authControllersV1 = {

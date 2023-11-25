@@ -1,6 +1,7 @@
 import express from 'express';
 import { authControllersV1 } from './controllers';
 import rateLimit from 'express-rate-limit';
+import checkVendorAuthorization from '../../../middlewares/checkVendorAuthorization';
 const authRouterV1 = express.Router();
 
 const requestLimiter = rateLimit({
@@ -13,6 +14,10 @@ const requestLimiter = rateLimit({
 authRouterV1.use(requestLimiter);
 
 authRouterV1.post('/signin', authControllersV1.signinVendor);
-authRouterV1.post('/logout', authControllersV1.signoutVendor);
+authRouterV1.post(
+  '/signout',
+  [checkVendorAuthorization],
+  authControllersV1.signoutVendor
+);
 
 export default authRouterV1;

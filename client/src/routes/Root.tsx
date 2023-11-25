@@ -12,7 +12,7 @@ const Root = () => {
   const { isVendorLoggedIn } = useAuth();
 
   return (
-    <div className='overflow-hidden'>
+    <div className='overflow-hidden min-h-screen'>
       <div className='shadow'>
         <Header />
       </div>

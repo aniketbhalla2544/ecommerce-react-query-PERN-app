@@ -25,7 +25,7 @@ const checkVendorAuthorization = async (
 
   try {
     const accessJwtToken = authHeader.split(' ')[1].trim();
-    console.log('--- JWT Token: ', accessJwtToken);
+    // console.log('--- JWT Token: ', accessJwtToken);
     const decodedVendor = (await verifyLoginAccessToken(accessJwtToken)) as unknown;
 
     //  ✅ validation of decoded user

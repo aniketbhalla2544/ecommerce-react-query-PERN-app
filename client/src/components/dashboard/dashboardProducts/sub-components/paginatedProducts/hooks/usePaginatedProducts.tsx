@@ -4,7 +4,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchProducts, deleteProduct } from '../../../../../../api/products';
 import { logger } from '../../../../../../utils/logger';
 
+type ProductsState = {
+  selectedProducts: number[];
+};
+
 const usePaginatedProducts = () => {
+  const [productsState, setProductsState] = React.useState<ProductsState>({
+    selectedProducts: [],
+  });
   const [deleteProductModalState, setDeleteProductModalState] = React.useState({
     showModal: false,
     showSpinner: false,
@@ -148,7 +155,30 @@ const usePaginatedProducts = () => {
     });
   };
 
+  const handleProductSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const isProductSelected = e.target.checked;
+    const selectedProductId = +e.target.value;
+    const newSelectedProducts = [...productsState.selectedProducts];
+    const productIdAlreadyExists = newSelectedProducts.includes(selectedProductId);
+    if (isProductSelected && selectedProductId && !productIdAlreadyExists) {
+      newSelectedProducts.push(selectedProductId);
+    } else {
+      if (productIdAlreadyExists) {
+        const toBeRemovedindex = newSelectedProducts.indexOf(selectedProductId);
+        if (toBeRemovedindex > -1) {
+          newSelectedProducts.splice(toBeRemovedindex, 1);
+        }
+      }
+    }
+    setProductsState((oldVal) => ({
+      ...oldVal,
+      selectedProducts: newSelectedProducts,
+    }));
+  };
+
   return {
+    productsState,
     limit,
     isPending,
     isError,
@@ -166,6 +196,7 @@ const usePaginatedProducts = () => {
     handleDeleteProductModalCancelBtnClick,
     handleDeleteProductTrashBtnIconClick,
     handleProductDeletion,
+    handleProductSelection,
   };
 };
 

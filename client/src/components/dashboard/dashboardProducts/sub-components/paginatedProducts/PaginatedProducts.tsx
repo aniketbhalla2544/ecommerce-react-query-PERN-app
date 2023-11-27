@@ -14,6 +14,7 @@ import UpdateProductModal from './sub-components/UpdateProductModal';
 import usePaginatedProducts from './hooks/usePaginatedProducts';
 import UpperControlBoard from './sub-components/UpperControlBoard/UpperControlBoard';
 import ConditionalRender from '../../../../utils/ConditionalRender';
+import TableColumns from './sub-components/TableColumns';
 
 const PRODUCT_NAME_MAX_LENGTH = 30;
 const PRODUCT_DESCRIPTION_MAX_LENGTH = 40;
@@ -39,6 +40,8 @@ const PaginatedProducts = () => {
     handleDeleteProductTrashBtnIconClick,
     handleProductDeletion,
     updatePage,
+    productsState,
+    handleProductSelection,
   } = usePaginatedProducts();
 
   if (isPending) return <Spinner />;
@@ -65,97 +68,96 @@ const PaginatedProducts = () => {
   return (
     <>
       <div className='bg-slate-100 px-8 py-10'>
-        <UpperControlBoard updatePage={updatePage} />
+        <UpperControlBoard
+          updatePage={updatePage}
+          selectedProductsCount={productsState.selectedProducts.length}
+        />
         <div className='min-h-[400px] max-h-[600px] overflow-y-auto'>
           <table className='table-auto w-full max-w-full overflow-y-auto'>
-            <thead>
-              <tr className='border-0 border-b-[1px] border-gray-200'>
-                <th scope='col' className='text-sm text-gray-600 px-4 py-3 text-left'>
-                  Id
-                </th>
-                <th scope='col' className='text-sm text-gray-600 py-3 text-left'>
-                  Image
-                </th>
-                <th scope='col' className='text-sm text-gray-600 py-3 text-left'>
-                  Name
-                </th>
-                <th scope='col' className='text-sm text-gray-600 py-3 text-left'>
-                  Description
-                </th>
-                <th scope='col' className='text-sm text-gray-600 py-3 text-left'>
-                  Price
-                </th>
-                <th scope='col' className='text-sm text-gray-600 py-3 text-left'>
-                  Delete
-                </th>
-                <th scope='col' className='text-sm text-gray-600 py-3 text-left'>
-                  Edit
-                </th>
-              </tr>
-            </thead>
+            <TableColumns />
             <tbody>
-              {products.map((product, index) => (
-                <tr key={index} className='odd:bg-white even:bg-slate-50 [&>td]:py-3'>
-                  <td className='px-4 text-gray-500'>{product.product_id}</td>
-                  <td>
-                    <div className='w-4 h-4'>
-                      <img
-                        src={product.image ?? ''}
-                        alt='vendor-profile-img'
-                        className='w-full h-full object-cover rounded-full'
+              {products.map((product, index) => {
+                const isProductSelected = productsState.selectedProducts.includes(
+                  product.product_id
+                );
+                const uniqueItemKey = `${index}-${isProductSelected}`;
+                return (
+                  <tr
+                    key={uniqueItemKey}
+                    className='odd:bg-white even:bg-slate-50 [&>td]:py-3 hover:bg-blue-100 hover:cursor-pointer'
+                  >
+                    <td className='text-center'>
+                      <input
+                        onChange={handleProductSelection}
+                        type='checkbox'
+                        checked={isProductSelected}
+                        name='product-selection'
+                        value={product.product_id as number}
+                        id={String(product.product_id)}
+                        className='hover:cursor-pointer w-[15px] h-[15px] align-middle'
                       />
-                    </div>
-                  </td>
-                  <td>
-                    <p className='text-gray-500 whitespace-nowrap'>
-                      <ConditionalRender
-                        truthyCondition={product.title.length > PRODUCT_NAME_MAX_LENGTH}
-                        falseCaseElement={product.title}
-                      >
-                        {product.title.substring(0, PRODUCT_NAME_MAX_LENGTH - 1)}
-                        ...
-                      </ConditionalRender>
-                    </p>
-                  </td>
-                  <td>
-                    <p className='text-gray-500 whitespace-nowrap'>
-                      <ConditionalRender
-                        truthyCondition={
-                          product.description.length > PRODUCT_DESCRIPTION_MAX_LENGTH
+                    </td>
+                    <td className='px-4 text-gray-500'>{product.product_id}</td>
+                    <td>
+                      <div className='w-4 h-4'>
+                        <img
+                          src={product.image ?? ''}
+                          alt='vendor-profile-img'
+                          className='w-full h-full object-cover rounded-full'
+                        />
+                      </div>
+                    </td>
+                    <td>
+                      <p className='text-gray-500 whitespace-nowrap'>
+                        <ConditionalRender
+                          truthyCondition={product.title.length > PRODUCT_NAME_MAX_LENGTH}
+                          falseCaseElement={product.title}
+                        >
+                          {product.title.substring(0, PRODUCT_NAME_MAX_LENGTH - 1)}
+                          ...
+                        </ConditionalRender>
+                      </p>
+                    </td>
+                    <td>
+                      <p className='text-gray-500 whitespace-nowrap'>
+                        <ConditionalRender
+                          truthyCondition={
+                            product.description.length > PRODUCT_DESCRIPTION_MAX_LENGTH
+                          }
+                          falseCaseElement={product.description}
+                        >
+                          {product.description.substring(
+                            0,
+                            PRODUCT_DESCRIPTION_MAX_LENGTH - 1
+                          )}
+                          ...
+                        </ConditionalRender>
+                      </p>
+                    </td>
+                    <td className='text-gray-500 text-sm'>
+                      {priceFormatter(product.price)}
+                    </td>
+                    <td>
+                      <button
+                        className='hover:text-red-500 p-2'
+                        onClick={() =>
+                          handleDeleteProductTrashBtnIconClick(product.product_id)
                         }
-                        falseCaseElement={product.description}
                       >
-                        {product.description.substring(
-                          0,
-                          PRODUCT_DESCRIPTION_MAX_LENGTH - 1
-                        )}
-                        ...
-                      </ConditionalRender>
-                    </p>
-                  </td>
-                  <td className='text-gray-500 text-sm'>
-                    {priceFormatter(product.price)}
-                  </td>
-                  <td>
-                    <button
-                      className='hover:text-red-500 p-2'
-                      onClick={() =>
-                        handleDeleteProductTrashBtnIconClick(product.product_id)
-                      }
-                    >
-                      <MdDelete />
-                    </button>
-                  </td>
-                  <td>
-                    <button
-                      onClick={() => handleUpdateProductIconClick(product.product_id)}
-                      className='hover:text-blue-500 p-2'
-                    >
-                      <BsPencilSquare />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                        <MdDelete />
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => handleUpdateProductIconClick(product.product_id)}
+                        className='hover:text-blue-500 p-2'
+                      >
+                        <BsPencilSquare />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

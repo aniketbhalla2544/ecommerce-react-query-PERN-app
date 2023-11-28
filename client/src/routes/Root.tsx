@@ -1,10 +1,9 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import Header from '../components/header/Header';
-import Container from '../components/utils/Container';
 import '../index.css';
 import useAuth from '../hooks/useAuth';
 import appRoutes from '../utils/app.routes';
 import ConditionalRender from '../components/utils/ConditionalRender';
+import DeleteModal from '../components/utils/modals/DeleteModal';
 
 // PROTECTED ROUTES
 
@@ -12,19 +11,17 @@ const Root = () => {
   const { isVendorLoggedIn } = useAuth();
 
   return (
-    <div className='overflow-hidden min-h-screen'>
-      <div className='shadow'>
-        <Header />
-      </div>
-      <Container>
+    <>
+      <div className='overflow-hidden min-h-screen'>
         <ConditionalRender
           truthyCondition={isVendorLoggedIn}
           falseCaseElement={<Navigate to={appRoutes.SIGNIN} replace={true} />}
         >
           <Outlet />
         </ConditionalRender>
-      </Container>
-    </div>
+      </div>
+      <DeleteModal />
+    </>
   );
 };
 

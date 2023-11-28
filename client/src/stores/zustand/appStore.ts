@@ -1,17 +1,39 @@
 import { create } from 'zustand';
-// import { devtools } from 'zustand/middleware';,
 import { Vendor } from '../../types/vendor';
 import { devtools, persist } from 'zustand/middleware';
+import { isProductionEnv } from '../../utils/utils';
 
-type AppState = {
-  accessToken: string;
-  vendor: Vendor;
-  setVendor: (vendor: Vendor) => void;
-  setAccessToken: (token: string) => void;
-  resetAppState: () => void;
+type DeleteModalState = {
+  showModal: boolean;
+  showSpinner: boolean;
+  modalHeading: string;
+  contentText: string;
 };
 
-const initialAppState = {
+type State = {
+  vendor: Vendor;
+  accessToken: string;
+  deleteModalState: DeleteModalState;
+};
+
+type StateActions = {
+  setVendor: (vendor: Vendor) => void;
+  setAccessToken: (token: string) => void;
+  resetAppState: VoidFunction;
+  resetDeleteModalState: VoidFunction;
+  onDeleteModalCancelBtnClick?: VoidFunction;
+  onDeleteModalDeleteBtnClick?: VoidFunction;
+  setDeleteModalState: (
+    state: DeleteModalState,
+    onCancelBtnClick: VoidFunction,
+    onDeleteBtnClick: VoidFunction
+  ) => void;
+  updateDeleteModalState: (state: Partial<DeleteModalState>) => void;
+};
+
+type AppState = State & StateActions;
+
+const initialAppState: State = {
   accessToken: '',
   vendor: {
     vendorId: '',
@@ -19,6 +41,12 @@ const initialAppState = {
     vendorSlug: '',
     fullname: '',
     isPremium: false,
+  },
+  deleteModalState: {
+    showModal: false,
+    showSpinner: false,
+    contentText: '',
+    modalHeading: '',
   },
 };
 
@@ -30,13 +58,29 @@ const useAppStore = create<AppState>()(
         setAccessToken: (token) => set(() => ({ accessToken: token })),
         setVendor: (vendor: Vendor) => set(() => ({ vendor })),
         resetAppState: () => set(() => initialAppState),
+        resetDeleteModalState: () =>
+          set(() => ({ deleteModalState: initialAppState.deleteModalState })),
+        setDeleteModalState: (state, onCancelBtnClick, onDeleteBtnClick) =>
+          set(() => ({
+            deleteModalState: state,
+            onDeleteModalCancelBtnClick: onCancelBtnClick,
+            onDeleteModalDeleteBtnClick: onDeleteBtnClick,
+          })),
+        updateDeleteModalState: (updatedState) =>
+          set((state) => ({
+            deleteModalState: { ...state.deleteModalState, ...updatedState },
+          })),
       }),
       {
         name: 'app-store',
+        partialize: (state) => ({
+          accessToken: state.accessToken,
+          vendor: state.vendor,
+        }),
       }
     ),
     {
-      enabled: true,
+      enabled: !isProductionEnv,
     }
   )
 );

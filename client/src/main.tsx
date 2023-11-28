@@ -21,23 +21,19 @@ export const router = createBrowserRouter(
       element: <VendorSignin />,
     },
     {
-      path: '/vendor/dashboard',
-      element: <DashboardPage />,
-      children: [
-        {
-          path: 'products',
-          element: <DashboardProducts />,
-        },
-      ],
-    },
-    {
-      path: '/vendor',
+      path: '/',
       element: <Root />,
       children: [
-        // {
-        //   path: 'paginated-products',
-        //   element: <PaginatedProducts />,
-        // },
+        {
+          path: 'vendor/dashboard',
+          element: <DashboardPage />,
+          children: [
+            {
+              path: 'products',
+              element: <DashboardProducts />,
+            },
+          ],
+        },
       ],
     },
   ],

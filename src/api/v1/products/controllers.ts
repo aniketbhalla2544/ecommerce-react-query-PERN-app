@@ -4,6 +4,8 @@ import createHttpError from 'http-errors';
 import { getOffset } from '../../db/queryHelpers';
 import { pgquery } from '../../../db';
 import { getLoggedInVendorId } from '../../../middlewares/checkVendorAuthorization';
+import { getZodValidationIssues, isZodError } from '../../../utils/errorHandlingUtils';
+import { productServices } from './services';
 
 async function getProduct(req: Request, res: Response) {
   const vendorId = getLoggedInVendorId(res);
@@ -116,28 +118,43 @@ async function createProduct(req: Request, res: Response) {
 }
 
 async function deleteProduct(req: Request, res: Response) {
-  const vendorId = getLoggedInVendorId(res);
-  const productId = Number(req.params.id.trim());
+  try {
+    const vendorId = getLoggedInVendorId(res);
+    const productId = +req.params.id.trim();
 
-  const result = await pgquery({
-    text: `UPDATE products 
-    SET is_archived = true
-    WHERE product_id = $1 AND is_archived = FALSE AND vendor_id = $2`,
-    values: [productId, vendorId],
-  });
-  const { rowCount: totalDeletedRows } = result;
+    // ✅
+    const ValidateProductId = z.number().min(1);
+    const validProductId = await ValidateProductId.parseAsync(productId);
+    const queryResult = await productServices.deleteProduct(validProductId, vendorId);
+    const { rowCount: totalDeletedProducts } = queryResult;
 
-  if (!totalDeletedRows) {
-    throw createHttpError(
-      404,
-      `Operation failed as product with id = ${productId} not found`
-    );
+    // ✅
+    if (!totalDeletedProducts) {
+      throw createHttpError(404, {
+        deleted: !!totalDeletedProducts,
+        error: 'Product not found',
+        productId,
+      });
+    }
+
+    return res.json({
+      deleted: !!totalDeletedProducts,
+      msg: 'product deleted',
+      productId,
+    });
+  } catch (error) {
+    console.log('in catch block');
+    if (isZodError(error)) {
+      console.log('catch block > is zod error');
+      const issue = getZodValidationIssues(error) as z.ZodIssue;
+      console.log('[deleteProduct]: error: ', issue);
+      throw createHttpError(400, {
+        error: issue.message,
+        productId: req.params.id,
+      });
+    }
+    throw error;
   }
-
-  return res.json({
-    success: !!totalDeletedRows,
-    msg: `product with id = ${productId} successfully deleted`,
-  });
 }
 
 async function updateProduct(req: Request, res: Response) {

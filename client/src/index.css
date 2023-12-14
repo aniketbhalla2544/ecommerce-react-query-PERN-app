@@ -53,4 +53,12 @@
   .input-focus-ring {
     @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500;
   }
+
+  .app-link {
+    @apply text-blue-500;
+  }
+
+  .disabled-state{
+    @apply opacity-30 cursor-not-allowed;
+  }
 }

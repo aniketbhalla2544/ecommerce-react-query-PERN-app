@@ -49,7 +49,7 @@ const useVendorSignin = () => {
   const isSigninStatusLoading = signinStatus === 'loading';
   const allFormControlsDisabled = isSigninStatusLoading;
   const isFormSubmitBtnDisabled = allFormControlsDisabled;
-  const isDefaultValuesBtnVisible = true && !isProductionEnv;
+  const isDefaultValuesBtnVisible = false && !isProductionEnv;
   const invalidCredentialsError = 'invalidCredentials' in _errors;
 
   const updateFormState = (newState: Partial<FormState>) => {

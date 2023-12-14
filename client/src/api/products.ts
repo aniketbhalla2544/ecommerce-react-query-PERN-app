@@ -1,9 +1,9 @@
-import { MutationProduct } from '../components/PaginatedProducts/sub-components/CreateProductModal';
+import { MutationProduct } from '../components/dashboard/dashboardProducts/sub-components/paginatedProducts/sub-components/CreateProductModal';
 import { Product, Products } from '../types/products';
 import { apiClient } from './api.config';
 
 // ---------- fetchProducts
-type FetchProductsQueryResponse = {
+export type FetchProductsQueryResponse = {
   success: boolean;
   data: Products;
   meta: {
@@ -40,7 +40,7 @@ export const deleteProduct = async (productId: number) => {
   await apiClient.delete(`/products/${productId}`);
 };
 
-// ---------- deleteProduct
+// ---------- updateProduct
 type UpdateProductParams = {
   productId: number;
   product: MutationProduct;

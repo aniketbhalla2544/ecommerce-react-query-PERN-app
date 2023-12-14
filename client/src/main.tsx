@@ -21,23 +21,19 @@ export const router = createBrowserRouter(
       element: <VendorSignin />,
     },
     {
-      path: '/vendor/dashboard',
-      element: <DashboardPage />,
-      children: [
-        {
-          path: 'products',
-          element: <DashboardProducts />,
-        },
-      ],
-    },
-    {
-      path: '/vendor',
+      path: '/',
       element: <Root />,
       children: [
-        // {
-        //   path: 'paginated-products',
-        //   element: <PaginatedProducts />,
-        // },
+        {
+          path: 'vendor/dashboard',
+          element: <DashboardPage />,
+          children: [
+            {
+              path: 'products',
+              element: <DashboardProducts />,
+            },
+          ],
+        },
       ],
     },
   ],
@@ -49,7 +45,7 @@ export const queryClient = new QueryClient();
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ReactQueryDevtools initialIsOpen />
+      <ReactQueryDevtools initialIsOpen={false} />
       <Toaster />
       <RouterProvider router={router} />
     </QueryClientProvider>

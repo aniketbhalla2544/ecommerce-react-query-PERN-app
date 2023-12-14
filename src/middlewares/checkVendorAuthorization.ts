@@ -41,7 +41,7 @@ const checkVendorAuthorization = async (
     }
     const existingVendor = rows[0] as Vendor;
 
-    console.log('loggedin as: ', existingVendor.fullname);
+    // console.log('loggedin as: ', existingVendor.fullname);
     res.locals.vendor = existingVendor;
 
     next();

@@ -11,20 +11,21 @@ export const priceFormatter = (price: number) => {
 type GeneratePromiseParams = {
   delay?: number;
   value?: unknown;
-  resolveValue?: boolean;
+  isResolved?: boolean;
 };
 
 export const generatePromise = ({
-  delay = 4000,
+  delay = 4000, // in ms
   value = 5,
-  resolveValue = true,
+  isResolved = true,
 }: GeneratePromiseParams) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      if (resolveValue) {
+      if (isResolved) {
         resolve(value);
         return;
       }
+      console.log('promise rejected');
       reject(value);
     }, delay);
   });

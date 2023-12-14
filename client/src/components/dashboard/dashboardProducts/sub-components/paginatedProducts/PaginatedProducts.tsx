@@ -11,10 +11,11 @@ import {
 } from 'react-icons/fi';
 import DeleteProductModal from './sub-components/DeleteProductModal';
 import UpdateProductModal from './sub-components/UpdateProductModal';
-import usePaginatedProducts from './hooks/usePaginatedProducts';
 import UpperControlBoard from './sub-components/UpperControlBoard/UpperControlBoard';
 import ConditionalRender from '../../../../utils/ConditionalRender';
 import TableColumns from './sub-components/TableColumns';
+import PaginatedProductsProvider from './providers/PaginatedProductsProvider';
+import usePaginatedProductsContext from './hooks/usePaginatedProductsContext';
 
 const PRODUCT_NAME_MAX_LENGTH = 30;
 const PRODUCT_DESCRIPTION_MAX_LENGTH = 40;
@@ -22,57 +23,55 @@ const rowLimits = [5, 10, 15, 25, 30];
 const lowerRowLimit = Math.min(...rowLimits);
 
 const PaginatedProducts = () => {
+  return (
+    <PaginatedProductsProvider>
+      <PaginatedProductsWithContext />
+    </PaginatedProductsProvider>
+  );
+};
+
+export default PaginatedProducts;
+
+function PaginatedProductsWithContext() {
   const {
-    limit,
-    isPending,
-    error,
-    isError,
-    queryResponseData,
-    page,
+    paginationState,
+    productsQueryState,
     updateProductModalState,
-    handleUpdateProductIconClick,
-    onUpdateProductModalClose,
     deleteProductModalState,
-    handleLimitChange,
-    handlePageIncrement,
-    handlePageDecrement,
-    handleDeleteProductModalCancelBtnClick,
-    handleDeleteProductTrashBtnIconClick,
-    handleProductDeletion,
-    updatePage,
     productsState,
-    handleProductSelection,
-  } = usePaginatedProducts();
+  } = usePaginatedProductsContext();
 
-  if (isPending) return <Spinner />;
+  if (productsQueryState.isPending) return <Spinner />;
 
-  if (isError) {
-    logger.error('Error while while fetching data: ', error?.message);
+  if (productsQueryState.isError) {
+    logger.error('Error while while fetching data: ', productsQueryState.error?.message);
     return <h3 className='font-bold text-xl'>🔴 Error loading data.</h3>;
   }
 
-  if (!queryResponseData || !queryResponseData.data) {
+  if (
+    !productsQueryState.queryResponseData ||
+    !productsQueryState.queryResponseData.data
+  ) {
     return <h4>😶 No data found.</h4>;
   }
 
   const {
     data: products,
     meta: { totalProductPages },
-  } = queryResponseData;
+  } = productsQueryState.queryResponseData;
 
-  const isPageIncrementBtnDisabled = page === totalProductPages || isPending;
-  const isPageDecrementBtnDisabled = page === 1 || isPending;
+  const isPageIncrementBtnDisabled =
+    paginationState.page === totalProductPages || productsQueryState.isPending;
+  const isPageDecrementBtnDisabled =
+    paginationState.page === 1 || productsQueryState.isPending;
   const isRowsPerPageSelectDisabled =
     totalProductPages === 1 && products.length < lowerRowLimit;
 
   return (
     <>
       <div className='bg-slate-100 px-8 py-10'>
-        <UpperControlBoard
-          updatePage={updatePage}
-          selectedProductsCount={productsState.selectedProducts.length}
-        />
-        <div className='min-h-[400px] max-h-[600px] overflow-y-auto'>
+        <UpperControlBoard />
+        <div className='min-h-[300px] max-h-[400px] overflow-y-auto'>
           <table className='table-auto w-full max-w-full overflow-y-auto'>
             <TableColumns />
             <tbody>
@@ -84,11 +83,15 @@ const PaginatedProducts = () => {
                 return (
                   <tr
                     key={uniqueItemKey}
-                    className='odd:bg-white even:bg-slate-50 [&>td]:py-3 hover:bg-blue-100 hover:cursor-pointer'
+                    className={`${
+                      isProductSelected
+                        ? 'bg-blue-100'
+                        : 'hover:bg-blue-100 odd:bg-white even:bg-slate-50'
+                    } [&>td]:py-3 hover:cursor-pointer `}
                   >
                     <td className='text-center'>
                       <input
-                        onChange={handleProductSelection}
+                        onChange={productsState.handleProductSelection}
                         type='checkbox'
                         checked={isProductSelected}
                         name='product-selection'
@@ -139,9 +142,16 @@ const PaginatedProducts = () => {
                     </td>
                     <td>
                       <button
-                        className='hover:text-red-500 p-2'
+                        disabled={productsState.isProductSelectionEditState}
+                        className={`p-2 ${
+                          productsState.isProductSelectionEditState
+                            ? 'disabled-state'
+                            : 'hover:text-red-500'
+                        }`}
                         onClick={() =>
-                          handleDeleteProductTrashBtnIconClick(product.product_id)
+                          deleteProductModalState.handleDeleteProductTrashBtnIconClick(
+                            product.product_id
+                          )
                         }
                       >
                         <MdDelete />
@@ -149,8 +159,17 @@ const PaginatedProducts = () => {
                     </td>
                     <td>
                       <button
-                        onClick={() => handleUpdateProductIconClick(product.product_id)}
-                        className='hover:text-blue-500 p-2'
+                        disabled={productsState.isProductSelectionEditState}
+                        onClick={() =>
+                          updateProductModalState.handleUpdateProductIconClick(
+                            product.product_id
+                          )
+                        }
+                        className={`p-2 ${
+                          productsState.isProductSelectionEditState
+                            ? 'disabled-state'
+                            : 'hover:text-blue-500'
+                        }`}
                       >
                         <BsPencilSquare />
                       </button>
@@ -165,13 +184,13 @@ const PaginatedProducts = () => {
         <div className='mt-10'>
           <div className='flex items-center justify-end gap-x-20'>
             {/* ---------------- rows per page control */}
-            <div className='flex items-center justify-center gap-x-4 flex-none text-sm'>
+            <div className='flex items-center justify-center gap-x-4 flex-none text-sm bg-white px-4 py-2 rounded-lg shadow-sm'>
               <p className='text-gray-500'>Rows per page</p>
               {/* ----------- limit control --------------- */}
               <select
                 disabled={isRowsPerPageSelectDisabled}
-                value={limit}
-                onChange={handleLimitChange}
+                value={paginationState.limit}
+                onChange={paginationState.handleLimitChange}
                 required
                 name='page'
                 id='page'
@@ -185,39 +204,39 @@ const PaginatedProducts = () => {
               </select>
             </div>
             {/* ----------- page increment/decrement control --------------- */}
-            <div className='flex justify-center items-center w-fit gap-4 flex-none overflow-hidden'>
+            <div className='flex justify-center items-center w-fit gap-4 flex-none overflow-hidden bg-white px-4 py-2 rounded-lg shadow-sm'>
               {/* ----------- page extreme left control --------------- */}
               <button
-                disabled={page === 1}
-                onClick={() => updatePage(1)}
-                className='bg-white flex-none flex justify-center items-center p-2 border cursor-pointer hover:bg-slate-100 disabled:hover:bg-none border-gray-200 rounded disabled:opacity-30  disabled:cursor-not-allowed'
+                disabled={paginationState.page === 1}
+                onClick={() => paginationState.updatePage(1)}
+                className='bg-white flex-none flex justify-center items-center p-2 cursor-pointer hover:bg-slate-100 disabled:hover:bg-none border-gray-200 rounded disabled:opacity-30  disabled:cursor-not-allowed'
               >
                 <FiChevronsLeft />
               </button>
               {/* ----------- page decrement control --------------- */}
               <button
                 disabled={isPageDecrementBtnDisabled}
-                onClick={handlePageDecrement}
-                className='bg-white flex-none flex justify-center items-center p-2 border cursor-pointer hover:bg-slate-100 disabled:hover:bg-none border-gray-200 rounded disabled:opacity-30  disabled:cursor-not-allowed'
+                onClick={paginationState.handlePageDecrement}
+                className='bg-white flex-none flex justify-center items-center p-2 cursor-pointer hover:bg-slate-100 disabled:hover:bg-none border-gray-200 rounded disabled:opacity-30  disabled:cursor-not-allowed'
               >
                 <FiChevronLeft />
               </button>
               <p className='flex-none text-sm text-gray-500'>
-                Page {page} of {totalProductPages}
+                Page {paginationState.page} of {totalProductPages}
               </p>
               {/* ----------- page increment control --------------- */}
               <button
                 disabled={isPageIncrementBtnDisabled}
-                onClick={handlePageIncrement}
-                className='bg-white flex-none flex justify-center items-center p-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-30 hover:bg-slate-100 disabled:hover:bg-none border border-gray-200 rounded'
+                onClick={paginationState.handlePageIncrement}
+                className='bg-white flex-none flex justify-center items-center p-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-30 hover:bg-slate-100 disabled:hover:bg-none border-gray-200 rounded'
               >
                 <FiChevronRight />
               </button>
               {/* ----------- page extreme right control --------------- */}
               <button
-                disabled={page === totalProductPages}
-                onClick={() => updatePage(totalProductPages)}
-                className='bg-white flex-none flex justify-center items-center p-2 border cursor-pointer hover:bg-slate-100 disabled:hover:bg-none border-gray-200 rounded disabled:opacity-30  disabled:cursor-not-allowed'
+                disabled={paginationState.page === totalProductPages}
+                onClick={() => paginationState.updatePage(totalProductPages)}
+                className='bg-white flex-none flex justify-center items-center p-2 cursor-pointer hover:bg-slate-100 disabled:hover:bg-none border-gray-200 rounded disabled:opacity-30  disabled:cursor-not-allowed'
               >
                 <FiChevronsRight />
               </button>
@@ -230,16 +249,14 @@ const PaginatedProducts = () => {
         showSpinner={deleteProductModalState.showSpinner}
         productId={deleteProductModalState.productId}
         showModal={deleteProductModalState.showModal}
-        onCancelBtnClick={handleDeleteProductModalCancelBtnClick}
-        onDeleteBtnClick={handleProductDeletion}
+        onCancelBtnClick={deleteProductModalState.handleDeleteProductModalCancelBtnClick}
+        onDeleteBtnClick={deleteProductModalState.handleProductDeletion}
       />
       <UpdateProductModal
         productId={updateProductModalState.productId}
         showModal={updateProductModalState.showModal}
-        onClose={onUpdateProductModalClose}
+        onClose={updateProductModalState.onUpdateProductModalClose}
       />
     </>
   );
-};
-
-export default PaginatedProducts;
+}

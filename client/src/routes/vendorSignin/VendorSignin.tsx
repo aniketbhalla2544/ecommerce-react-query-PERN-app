@@ -90,7 +90,9 @@ const VendorSignin = () => {
           </form>
           <p className='text-center text-sm mt-4'>
             Don't have an account?<span> </span>
-            <Link to={appRoutes.REGISTER}>Create Account</Link>
+            <Link to={appRoutes.REGISTER} className='app-link'>
+              Create Account
+            </Link>
           </p>
         </div>
       </div>

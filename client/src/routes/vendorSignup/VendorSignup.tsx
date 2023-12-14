@@ -53,9 +53,7 @@ const VendorSignup = () => {
                 <FormErrorMsg isVisible={isVendorConflictError}>
                   <p>
                     Vendor with email {email} already exists. Please consider{' '}
-                    <Link to={appRoutes.SIGNIN} replace>
-                      signing in
-                    </Link>
+                    <Link to={appRoutes.SIGNIN}>signing in</Link>
                   </p>
                 </FormErrorMsg>
               </ul>
@@ -137,7 +135,9 @@ const VendorSignup = () => {
             </form>
             <p className='text-center text-sm mt-4'>
               Already have an account?<span> </span>
-              <Link to={appRoutes.SIGNIN}>Sign In</Link>
+              <Link className='app-link' to={appRoutes.SIGNIN}>
+                Sign In
+              </Link>
             </p>
           </div>
         </div>

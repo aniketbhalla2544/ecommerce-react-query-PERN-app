@@ -45,7 +45,7 @@ export const queryClient = new QueryClient();
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ReactQueryDevtools initialIsOpen />
+      <ReactQueryDevtools initialIsOpen={false} />
       <Toaster />
       <RouterProvider router={router} />
     </QueryClientProvider>

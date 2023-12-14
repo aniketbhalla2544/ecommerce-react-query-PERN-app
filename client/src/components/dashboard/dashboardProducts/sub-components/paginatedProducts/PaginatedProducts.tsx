@@ -71,7 +71,7 @@ function PaginatedProductsWithContext() {
     <>
       <div className='bg-slate-100 px-8 py-10'>
         <UpperControlBoard />
-        <div className='min-h-[400px] max-h-[600px] overflow-y-auto'>
+        <div className='min-h-[300px] max-h-[400px] overflow-y-auto'>
           <table className='table-auto w-full max-w-full overflow-y-auto'>
             <TableColumns />
             <tbody>
@@ -184,7 +184,7 @@ function PaginatedProductsWithContext() {
         <div className='mt-10'>
           <div className='flex items-center justify-end gap-x-20'>
             {/* ---------------- rows per page control */}
-            <div className='flex items-center justify-center gap-x-4 flex-none text-sm'>
+            <div className='flex items-center justify-center gap-x-4 flex-none text-sm bg-white px-4 py-2 rounded-lg shadow-sm'>
               <p className='text-gray-500'>Rows per page</p>
               {/* ----------- limit control --------------- */}
               <select
@@ -204,12 +204,12 @@ function PaginatedProductsWithContext() {
               </select>
             </div>
             {/* ----------- page increment/decrement control --------------- */}
-            <div className='flex justify-center items-center w-fit gap-4 flex-none overflow-hidden'>
+            <div className='flex justify-center items-center w-fit gap-4 flex-none overflow-hidden bg-white px-4 py-2 rounded-lg shadow-sm'>
               {/* ----------- page extreme left control --------------- */}
               <button
                 disabled={paginationState.page === 1}
                 onClick={() => paginationState.updatePage(1)}
-                className='bg-white flex-none flex justify-center items-center p-2 border cursor-pointer hover:bg-slate-100 disabled:hover:bg-none border-gray-200 rounded disabled:opacity-30  disabled:cursor-not-allowed'
+                className='bg-white flex-none flex justify-center items-center p-2 cursor-pointer hover:bg-slate-100 disabled:hover:bg-none border-gray-200 rounded disabled:opacity-30  disabled:cursor-not-allowed'
               >
                 <FiChevronsLeft />
               </button>
@@ -217,7 +217,7 @@ function PaginatedProductsWithContext() {
               <button
                 disabled={isPageDecrementBtnDisabled}
                 onClick={paginationState.handlePageDecrement}
-                className='bg-white flex-none flex justify-center items-center p-2 border cursor-pointer hover:bg-slate-100 disabled:hover:bg-none border-gray-200 rounded disabled:opacity-30  disabled:cursor-not-allowed'
+                className='bg-white flex-none flex justify-center items-center p-2 cursor-pointer hover:bg-slate-100 disabled:hover:bg-none border-gray-200 rounded disabled:opacity-30  disabled:cursor-not-allowed'
               >
                 <FiChevronLeft />
               </button>
@@ -228,7 +228,7 @@ function PaginatedProductsWithContext() {
               <button
                 disabled={isPageIncrementBtnDisabled}
                 onClick={paginationState.handlePageIncrement}
-                className='bg-white flex-none flex justify-center items-center p-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-30 hover:bg-slate-100 disabled:hover:bg-none border border-gray-200 rounded'
+                className='bg-white flex-none flex justify-center items-center p-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-30 hover:bg-slate-100 disabled:hover:bg-none border-gray-200 rounded'
               >
                 <FiChevronRight />
               </button>
@@ -236,7 +236,7 @@ function PaginatedProductsWithContext() {
               <button
                 disabled={paginationState.page === totalProductPages}
                 onClick={() => paginationState.updatePage(totalProductPages)}
-                className='bg-white flex-none flex justify-center items-center p-2 border cursor-pointer hover:bg-slate-100 disabled:hover:bg-none border-gray-200 rounded disabled:opacity-30  disabled:cursor-not-allowed'
+                className='bg-white flex-none flex justify-center items-center p-2 cursor-pointer hover:bg-slate-100 disabled:hover:bg-none border-gray-200 rounded disabled:opacity-30  disabled:cursor-not-allowed'
               >
                 <FiChevronsRight />
               </button>

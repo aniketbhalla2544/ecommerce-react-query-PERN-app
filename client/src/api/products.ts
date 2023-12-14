@@ -40,7 +40,7 @@ export const deleteProduct = async (productId: number) => {
   await apiClient.delete(`/products/${productId}`);
 };
 
-// ---------- deleteProduct
+// ---------- updateProduct
 type UpdateProductParams = {
   productId: number;
   product: MutationProduct;

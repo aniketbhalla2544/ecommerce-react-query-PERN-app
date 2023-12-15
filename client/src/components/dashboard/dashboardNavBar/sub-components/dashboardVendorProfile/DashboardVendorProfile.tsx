@@ -63,7 +63,7 @@ const DashboardVendorProfile = () => {
               </span>{' '}
               <span>Public website</span>
             </NavLink>
-            <NavLink path={appRoutes.dashboard.DASHBOARD}>
+            <NavLink path={appRoutes.dashboard.SETTINGS}>
               <IoSettingsOutline /> <span>Settings</span>
             </NavLink>
             <li>

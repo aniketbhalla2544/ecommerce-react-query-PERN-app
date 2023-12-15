@@ -9,6 +9,7 @@ import VendorSignup from './routes/vendorSignup/VendorSignup';
 import VendorSignin from './routes/vendorSignin/VendorSignin';
 import DashboardPage from './routes/DashboardPage';
 import DashboardProducts from './components/dashboard/dashboardProducts/DashboardProducts';
+import DashboardSettings from './components/dashboard/dashboardSettings/dashboardSettings';
 
 export const router = createBrowserRouter(
   [
@@ -32,10 +33,16 @@ export const router = createBrowserRouter(
               path: 'products',
               element: <DashboardProducts />,
             },
+            {
+              path: "settings",
+              element: <DashboardSettings />
+            }
+
           ],
         },
       ],
     },
+
   ],
   {}
 );

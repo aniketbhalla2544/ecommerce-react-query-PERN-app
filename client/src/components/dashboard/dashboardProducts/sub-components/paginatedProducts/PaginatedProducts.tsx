@@ -83,11 +83,10 @@ function PaginatedProductsWithContext() {
                 return (
                   <tr
                     key={uniqueItemKey}
-                    className={`${
-                      isProductSelected
-                        ? 'bg-blue-100'
-                        : 'hover:bg-blue-100 odd:bg-white even:bg-slate-50'
-                    } [&>td]:py-3 hover:cursor-pointer `}
+                    className={`${isProductSelected
+                      ? 'bg-blue-100'
+                      : 'hover:bg-blue-100 odd:bg-white even:bg-slate-50'
+                      } [&>td]:py-3 hover:cursor-pointer `}
                   >
                     <td className='text-center'>
                       <input
@@ -143,11 +142,10 @@ function PaginatedProductsWithContext() {
                     <td>
                       <button
                         disabled={productsState.isProductSelectionEditState}
-                        className={`p-2 ${
-                          productsState.isProductSelectionEditState
-                            ? 'disabled-state'
-                            : 'hover:text-red-500'
-                        }`}
+                        className={`p-2 ${productsState.isProductSelectionEditState
+                          ? 'disabled-state'
+                          : 'hover:text-red-500'
+                          }`}
                         onClick={() =>
                           deleteProductModalState.handleDeleteProductTrashBtnIconClick(
                             product.product_id
@@ -165,11 +163,10 @@ function PaginatedProductsWithContext() {
                             product.product_id
                           )
                         }
-                        className={`p-2 ${
-                          productsState.isProductSelectionEditState
-                            ? 'disabled-state'
-                            : 'hover:text-blue-500'
-                        }`}
+                        className={`p-2 ${productsState.isProductSelectionEditState
+                          ? 'disabled-state'
+                          : 'hover:text-blue-500'
+                          }`}
                       >
                         <BsPencilSquare />
                       </button>

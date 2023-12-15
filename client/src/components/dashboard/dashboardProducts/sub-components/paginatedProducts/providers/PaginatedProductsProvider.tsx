@@ -11,8 +11,9 @@ import {
   UpdateProductModalState,
 } from './paginationProductsContextTypes';
 
-export const PaginatedProductsContext =
-  React.createContext<PaginatedProductsContextType | null>(null);
+
+
+export const PaginatedProductsContext = React.createContext<PaginatedProductsContextType | null>(null);
 
 const PaginatedProductsProvider = ({ children }: Record<'children', React.ReactNode>) => {
   const [productsState, setProductsState] = React.useState<ProductsState>({
@@ -74,8 +75,8 @@ const PaginatedProductsProvider = ({ children }: Record<'children', React.ReactN
         updatePage(page - 1);
       }
     },
-    onSettled: () => {},
-    onError: () => {},
+    onSettled: () => { },
+    onError: () => { },
   });
 
   const handleLimitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

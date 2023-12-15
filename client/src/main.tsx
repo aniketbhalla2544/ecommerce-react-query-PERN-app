@@ -17,7 +17,7 @@ export const router = createBrowserRouter(
       element: <VendorSignup />,
     },
     {
-      path: '/signin',
+      path: '/sign-in',
       element: <VendorSignin />,
     },
     {

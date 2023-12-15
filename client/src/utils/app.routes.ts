@@ -1,5 +1,5 @@
 const appRoutes = {
-  SIGNIN: '/signin',
+  SIGNIN: '/sign-in',
   REGISTER: '/register',
   HOME: '/vendor',
   dashboard: {

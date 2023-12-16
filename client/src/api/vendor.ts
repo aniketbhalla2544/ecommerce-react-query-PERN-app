@@ -11,12 +11,14 @@ export const registerVendor = async (registerVendor: RegisterVendor) => {
   });
 };
 
-type GetVendorResponse = {
+export type GetVendorResponse = {
   success: boolean;
   data: Vendor;
 };
-
+// changed data.data to data cz need the whole Res.
 export const getVendor = async () => {
   const { data } = await apiClient.get<GetVendorResponse>('/vendors/');
   return data.data;
 };
+
+

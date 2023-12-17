@@ -1,3 +1,4 @@
+import { updatedSettingsState } from '../components/dashboard/dashboardSettings/providers/vendorSettingsContextTypes';
 import { RegisterVendor, Vendor } from '../types/vendor';
 import { apiClient } from './api.config';
 
@@ -10,6 +11,12 @@ export const registerVendor = async (registerVendor: RegisterVendor) => {
     password,
   });
 };
+
+export const updateVendor = async (fieldsChanged:updatedSettingsState)=>{
+    console.log({...fieldsChanged})
+    const res = await apiClient.post('/vendors/update' , {...fieldsChanged});
+    return res.data
+}
 
 export type GetVendorResponse = {
   success: boolean;

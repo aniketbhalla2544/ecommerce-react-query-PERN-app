@@ -1,13 +1,15 @@
 import React, { useEffect } from "react"
-import { vendorSettingsStateContextType } from "./vendorSettingsContextTypes"
+import { updatedSettingsState, vendorSettingsStateContextType } from "./vendorSettingsContextTypes"
 import { useQuery } from "@tanstack/react-query";
-import { getVendor } from "../../../../api/vendor";
+import { getVendor, updateVendor } from "../../../../api/vendor";
 import { Vendor } from "../../../../types/vendor";
+import toast from "react-hot-toast";
 
 export const VendorSettingsContext = React.createContext<vendorSettingsStateContextType | null>(null);
 // provider for vendros setting page
 const VendorSettingsProvider = ({ children }: Record<"children", React.ReactNode>) => {
-
+    //  states for just changed fields insted of updating all the vendor settings
+    const [changedFields, setChangedFields] = React.useState<updatedSettingsState>({})
     // vendor profile data from DB 
     const {
         data: queryResponseData,
@@ -33,16 +35,27 @@ const VendorSettingsProvider = ({ children }: Record<"children", React.ReactNode
     // to update the profile data from UI  
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         e.preventDefault();
+
         setVendorData((prevVendorData) => ({
             ...prevVendorData,
             [e.target.name]: e.target.value,
         } as Vendor));
-
+        setChangedFields({ ...changedFields, [e.target.name]: e.target.value, })
     }
     // to update the profile data in DB  
-    const handleSubmit = () => {
-        console.log(vendorData)
+    const handleSubmit = async () => {
+        const res = await updateVendor(changedFields)
+
+        if (res.success)
+            toast("Settings updated ! ✅")
+        else
+            toast("Something went wrong ! ❌")
+        // to remove save button 
+        setIsChanged(false)
+        setChangedFields({})
     }
+
+    // 
     return <VendorSettingsContext.Provider
         value={{
             vendorSettingsQueryState: {

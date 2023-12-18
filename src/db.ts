@@ -4,6 +4,7 @@ import { types } from 'pg';
 const env = process.env;
 
 types.setTypeParser(1700, (x) => parseFloat(x));
+
 const dbConfig: ClientConfig = {
   database: env.POSTGRES_DB,
   user: env.POSTGRES_USER,
@@ -13,12 +14,12 @@ const dbConfig: ClientConfig = {
 };
 
 const pool = new Pool({
-  user: dbConfig.user || "postgres",
-  password: dbConfig.password || "admin",
-  host: dbConfig.host || "localhost",
+  user: dbConfig.user,
+  password: dbConfig.password,
+  host: dbConfig.host,
   port: dbConfig.port,
   max: 5,
-  database: dbConfig.database || "ecom",
+  database: dbConfig.database,
 });
 
 // # events

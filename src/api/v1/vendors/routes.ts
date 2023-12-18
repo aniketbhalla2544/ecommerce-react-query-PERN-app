@@ -13,6 +13,5 @@ vendorRouterV1.post(
 vendorRouterV1.use(checkVendorAuthorization);
 
 vendorRouterV1.get('/', vendorControllersV1.getVendor);
-vendorRouterV1.post('/update', vendorControllersV1.updateVendor);
 
 export default vendorRouterV1;

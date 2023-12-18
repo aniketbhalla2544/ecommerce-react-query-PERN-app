@@ -35,7 +35,7 @@ const DashboardSettings = () => {
 
     return (
         <div className="ml-10">
-            <h1 className="font-bold text-xl "> Account Settings</h1>
+            <h1 className="font-bold text-lg "> Account and Security Settings</h1>
 
             <div className="ml-5 mt-5 bg-white p-5  border border-s-4 border-s-blue-500 rounded-xl grid grid-cols-2  ">
                 <span>
@@ -75,6 +75,24 @@ const DashboardSettings = () => {
                 </span>
             </div>
 
+            <h1 className="font-bold text-lg mt-5"> Customizations  </h1>
+
+            <div className="ml-5 mt-5 bg-white p-5  border border-s-4 border-s-blue-500 rounded-xl grid grid-cols-2  ">
+                <span>
+                    <h1 className="font-small text-lg  mt-1 font-semibold flex">
+                        in progress
+                    </h1>
+                </span>
+            </div>
+            <h1 className="font-bold text-lg mt-5"> Product Management Settings </h1>
+
+            <div className="ml-5 mt-5 bg-white p-5  border border-s-4 border-s-blue-500 rounded-xl grid grid-cols-2  ">
+                <span>
+                    <h1 className="font-small text-lg  mt-1 font-semibold flex">
+                        in progress
+                    </h1>
+                </span>
+            </div>
             {/* will show the buuton only if the changes are made */}
             {isChanged ? (
                 <button

@@ -11,6 +11,14 @@ type vendorSettingsState = {
     handleSubmit: () => void;
     isChanged: boolean;
 } & {};
+ 
+export type updatedSettingsState = Partial<
+  Pick<Vendor, 'email' | 'fullname' | 'isPremium' | 'vendorId' |'vendorSlug'>
+>;
+
+
+
+
 
 export type vendorSettingsStateContextType = {
     vendorSettingsQueryState: vendorSettingsState;

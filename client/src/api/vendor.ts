@@ -13,8 +13,9 @@ export const registerVendor = async (registerVendor: RegisterVendor) => {
 };
 
 export const updateVendor = async (fieldsChanged:updatedSettingsState)=>{
-    console.log({...fieldsChanged})
-    const res = await apiClient.post('/vendors/update' , {...fieldsChanged});
+    const { email, fullname , isPremium , vendorId , vendorSlug:vendor_slug } = fieldsChanged;
+    
+    const res = await apiClient.post('/vendors/update' , { email, fullname , isPremium , vendorId , vendor_slug });
     return res.data
 }
 

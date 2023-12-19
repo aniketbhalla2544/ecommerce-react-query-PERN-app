@@ -1,66 +1,65 @@
 import React, { useEffect } from "react"
 import { updatedSettingsState, vendorSettingsStateContextType } from "./vendorSettingsContextTypes"
-import { useQuery } from "@tanstack/react-query";
-import { getVendor, updateVendor } from "../../../../api/vendor";
-import { Vendor } from "../../../../types/vendor";
+import { updateVendor } from "../../../../api/vendor";
 import toast from "react-hot-toast";
+import useAppStore from "../../../../stores/zustand/appStore";
+import { useForm } from "react-hook-form";
+import { Vendor } from "../../../../types/vendor";
+import { AxiosError } from "axios";
 
 export const VendorSettingsContext = React.createContext<vendorSettingsStateContextType | null>(null);
 // provider for vendros setting page
 const VendorSettingsProvider = ({ children }: Record<"children", React.ReactNode>) => {
-    //  states for just changed fields insted of updating all the vendor settings
-    const [changedFields, setChangedFields] = React.useState<updatedSettingsState>({})
-    // vendor profile data from DB 
-    const {
-        data: queryResponseData,
-        isPending,
-        isError,
-        error,
-    } = useQuery({ queryKey: [], queryFn: () => getVendor() });
+    // load vendor profile data from AppStore 
+    const { vendor: vendorData } = useAppStore.getState();
+    const { register, handleSubmit, formState: { errors }, setError } = useForm<updatedSettingsState>();
 
-    // used useState to update changes
-    const [vendorData, setVendorData] = React.useState<Vendor | undefined>(queryResponseData);
-    // will help to conditionalRendering of save button 
-    const [isChanged, setIsChanged] = React.useState<boolean>(false);
-
-    // to update the UI after promiss resolve and got the data 
+    // to check the errors
     useEffect(() => {
-        setVendorData(queryResponseData)
-    }, [queryResponseData])
-    // separate for isChanged due to synchronous behaviour of usestate 
-    useEffect(() => {
-        setIsChanged(JSON.stringify(vendorData) === JSON.stringify(queryResponseData) ? false : true);
-    }, [vendorData])
-
-    // to update the profile data from UI  
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        e.preventDefault();
-        setVendorData((prevVendorData) => ({
-            ...prevVendorData,
-            [e.target.name]: e.target.value,
-        } as Vendor));
-        setChangedFields({ ...changedFields, [e.target.name]: e.target.value, })
-    }
+        if (Object.keys(errors).length) {
+            if (errors.email) {
+                if (errors.email.type) {
+                    setError("email", { type: "custom", message: "please enter correct email" })
+                }
+            }
+        }
+    }, [errors])
     // to update the profile data in DB  
-    const handleSubmit = async () => {
-        const res = await updateVendor(changedFields)
+    const onSubmit = async (data: updatedSettingsState) => {
 
-        if (res.success)
-            toast("Settings updated ! ✅")
-        else
-            toast("Something went wrong ! ❌")
-        // to remove save button 
-        setIsChanged(false)
-        setChangedFields({})
+        try {
+            const res = await updateVendor(data)
+            if (res.success) {
+                toast("Settings updated ! ✅")
+                useAppStore.setState({ vendor: data as Vendor })
+            }
+        } catch (e) {
+            let error = ""
+            if (e instanceof AxiosError) {
+                error = e.response?.data.msg
+                if (error.includes("duplicate")) {
+                    setError("vendorSlug", { type: "custom", message: "Vendor slug is not available" })
+                }
+            }
+
+            toast("Something went wrong ! ❌ " + error)
+            // need to check all the errors
+        }
+
+        // else { toast("Something went wrong ! ❌") }
+        // // to remove save button 
+        // setIsChanged(false) 
     }
 
     // 
     return <VendorSettingsContext.Provider
         value={{
             vendorSettingsQueryState: {
-                isError, isPending, queryResponseData: vendorData, error, isChanged,
+                queryResponseData: vendorData,
                 handleSubmit,
-                handleChange
+                register,
+                onSubmit,
+                errors
             },
 
         }}

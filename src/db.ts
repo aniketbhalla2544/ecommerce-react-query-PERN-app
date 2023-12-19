@@ -13,12 +13,12 @@ const dbConfig: ClientConfig = {
 };
 
 const pool = new Pool({
-  user: dbConfig.user || "postgres",
-  password: dbConfig.password || "admin",
-  host: dbConfig.host || "localhost",
+  user: dbConfig.user ,
+  password: dbConfig.password ,
+  host: dbConfig.host ,
   port: dbConfig.port,
   max: 5,
-  database: dbConfig.database || "ecom",
+  database: dbConfig.database ,
 });
 
 // # events

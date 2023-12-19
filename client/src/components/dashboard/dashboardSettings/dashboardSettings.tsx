@@ -23,7 +23,6 @@ const DashboardSettings = () => {
         isChanged,
         handleSubmit,
         handleChange,
-        onSubmit
     } = useVendroSettingsContext();
 
     if (isPending) return <Spinner />;
@@ -36,75 +35,74 @@ const DashboardSettings = () => {
 
     return (
         <div className="ml-10">
-            <form onSubmit={handleSubmit(onSubmit)} >
-                <h1 className="font-bold text-lg "> Account and Security Settings</h1>
+            <h1 className="font-bold text-lg "> Account and Security Settings</h1>
 
-                <div className="ml-5 mt-5 bg-white p-5  border border-s-4 border-s-blue-500 rounded-xl grid grid-cols-2  ">
-                    <span>
-                        <h1 className="font-small text-lg  mt-1 font-semibold flex">
-                            Full Name
-                        </h1>
-                        <input
-                            className="p-2 mt-2 outline-gray-300  border border-black-50 rounded-lg bg-white"
-                            spellCheck="false"
-                            type="text"
-                            defaultValue={vendor?.fullname || ""}
+            <div className="ml-5 mt-5 bg-white p-5  border border-s-4 border-s-blue-500 rounded-xl grid grid-cols-2  ">
+                <span>
+                    <h1 className="font-small text-lg  mt-1 font-semibold flex">
+                        Full Name
+                    </h1>
+                    <input
+                        className="p-2 mt-2 outline-gray-300  border border-black-50 rounded-lg bg-white"
+                        spellCheck="false"
+                        type="text"
+                        value={vendor?.fullname || ""}
+                        name="fullname"
+                        onChange={(e) => handleChange(e)}
+                    />
+                </span>
+                <span>
+                    <h1 className="font-small text-lg  mt-1 font-semibold flex">Email</h1>
+                    <input
+                        className="p-2 mt-2 outline-gray-300  border border-black-50 rounded-lg bg-white"
+                        spellCheck="false"
+                        type="text"
+                        value={vendor?.email || ""}
+                        name="email"
+                        onChange={(e) => handleChange(e)}
+                    />
+                </span>
+                <span>
+                    <h1 className="font-small text-lg  mt-1 font-semibold flex">Slug</h1>
+                    <input
+                        className="p-2 mt-2 outline-gray-300  border border-black-50 rounded-lg bg-white"
+                        spellCheck="false"
+                        type="text"
+                        value={vendor?.vendorSlug || ""}
+                        name="vendorSlug"
+                        onChange={(e) => handleChange(e)}
+                    />
+                </span>
+            </div>
 
-                            {...handleChange("fullname", { required: true })}
-                        />
-                    </span>
-                    <span>
-                        <h1 className="font-small text-lg  mt-1 font-semibold flex">Email</h1>
-                        <input
-                            className="p-2 mt-2 outline-gray-300  border border-black-50 rounded-lg bg-white"
-                            spellCheck="false"
-                            type="text"
-                            defaultValue={vendor?.email || ""}
-                            {...handleChange("email", { required: true })}
-                        />
-                    </span>
-                    <span>
-                        <h1 className="font-small text-lg  mt-1 font-semibold flex">Slug</h1>
-                        <input
-                            className="p-2 mt-2 outline-gray-300  border border-black-50 rounded-lg bg-white"
-                            spellCheck="false"
-                            type="text"
-                            defaultValue={vendor?.vendorSlug || ""}
+            <h1 className="font-bold text-lg mt-5"> Customizations  </h1>
 
-                            {...handleChange("vendorSlug", { required: true })}
-                        />
-                    </span>
-                </div>
+            <div className="ml-5 mt-5 bg-white p-5  border border-s-4 border-s-blue-500 rounded-xl grid grid-cols-2  ">
+                <span>
+                    <h1 className="font-small text-lg  mt-1 font-semibold flex">
+                        in progress
+                    </h1>
+                </span>
+            </div>
+            <h1 className="font-bold text-lg mt-5"> Product Management Settings </h1>
 
-                <h1 className="font-bold text-lg mt-5"> Customizations  </h1>
-
-                <div className="ml-5 mt-5 bg-white p-5  border border-s-4 border-s-blue-500 rounded-xl grid grid-cols-2  ">
-                    <span>
-                        <h1 className="font-small text-lg  mt-1 font-semibold flex">
-                            in progress
-                        </h1>
-                    </span>
-                </div>
-                <h1 className="font-bold text-lg mt-5"> Product Management Settings </h1>
-
-                <div className="ml-5 mt-5 bg-white p-5  border border-s-4 border-s-blue-500 rounded-xl grid grid-cols-2  ">
-                    <span>
-                        <h1 className="font-small text-lg  mt-1 font-semibold flex">
-                            in progress
-                        </h1>
-                    </span>
-                </div>
-                {/* will show the buuton only if the changes are made */}
-                {!isChanged ? (
-                    <button
-                        type="submit"
-                        className="btn bg-blue-500 hover:bg-blue-600 ml-8 mt-5 text-white flex items-center justify-center gap-x-4"
-                        onClick={() => handleSubmit(onSubmit)}
-                    >
-                        Save
-                    </button>
-                ) : null}
-            </form>
+            <div className="ml-5 mt-5 bg-white p-5  border border-s-4 border-s-blue-500 rounded-xl grid grid-cols-2  ">
+                <span>
+                    <h1 className="font-small text-lg  mt-1 font-semibold flex">
+                        in progress
+                    </h1>
+                </span>
+            </div>
+            {/* will show the buuton only if the changes are made */}
+            {isChanged ? (
+                <button
+                    type="submit"
+                    className="btn bg-blue-500 hover:bg-blue-600 ml-8 mt-5 text-white flex items-center justify-center gap-x-4"
+                    onClick={() => handleSubmit()}
+                >
+                    Save
+                </button>
+            ) : null}
         </div>
     );
 };

@@ -1,5 +1,4 @@
 
-import { FieldValues, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
 import { Vendor } from "../../../../types/vendor";
 
 // global contextType for the VendorSettings page
@@ -8,11 +7,8 @@ type vendorSettingsState = {
     isPending: boolean;
     isError: boolean;
     error: Error | null;
-    // handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElem ent>) => void;
-    // handleSubmit: () => void;
-    handleChange: UseFormRegister<FieldValues>;
-    handleSubmit:UseFormHandleSubmit<FieldValues, undefined>;
-    onSubmit: (data:any) =>void;
+    handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    handleSubmit: () => void;
     isChanged: boolean;
 } & {};
  

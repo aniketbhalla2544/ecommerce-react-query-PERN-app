@@ -29,7 +29,7 @@ async function signinVendor(req: Request, res: Response) {
   }
 
   try {
-    // ✅ validating login credentials
+    // ✅ validating login credentials 
     const decodedCredentials = atob(encodedCredentials).split(':');
     const [email, password] = decodedCredentials;
 

@@ -20,3 +20,8 @@ export const getVendor = async () => {
   const { data } = await apiClient.get<GetVendorResponse>('/vendors/');
   return data.data;
 };
+
+export const updateVendor = async () => {
+  const { data } = await apiClient.get<GetVendorResponse>('/vendors/');
+  return data.data;
+};

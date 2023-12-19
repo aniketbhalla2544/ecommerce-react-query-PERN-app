@@ -1,9 +1,11 @@
 import React, { useEffect } from "react"
 import { updatedSettingsState, vendorSettingsStateContextType } from "./vendorSettingsContextTypes"
 import { useQuery } from "@tanstack/react-query";
-import { getVendor, updateVendor } from "../../../../api/vendor";
+import { getVendor } from "../../../../api/vendor";
 import { Vendor } from "../../../../types/vendor";
 import toast from "react-hot-toast";
+
+import { useForm } from 'react-hook-form';
 
 export const VendorSettingsContext = React.createContext<vendorSettingsStateContextType | null>(null);
 // provider for vendros setting page
@@ -17,6 +19,9 @@ const VendorSettingsProvider = ({ children }: Record<"children", React.ReactNode
         isError,
         error,
     } = useQuery({ queryKey: [], queryFn: () => getVendor() });
+    const { register, handleSubmit, formState: { errors } } = useForm();
+
+    console.log(errors);
 
     // used useState to update changes
     const [vendorData, setVendorData] = React.useState<Vendor | undefined>(queryResponseData);
@@ -33,16 +38,16 @@ const VendorSettingsProvider = ({ children }: Record<"children", React.ReactNode
     }, [vendorData])
 
     // to update the profile data from UI  
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        e.preventDefault();
-        setVendorData((prevVendorData) => ({
-            ...prevVendorData,
-            [e.target.name]: e.target.value,
-        } as Vendor));
-        setChangedFields({ ...changedFields, [e.target.name]: e.target.value, })
-    }
+    // const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    //     e.preventDefault();
+    //     setVendorData((prevVendorData) => ({
+    //         ...prevVendorData,
+    //         [e.target.name]: e.target.value,
+    //     } as Vendor));
+    //     setChangedFields({ ...changedFields, [e.target.name]: e.target.value, })
+    // }
     // to update the profile data in DB  
-    const handleSubmit = async () => {
+    const onSubmit = async () => {
         const res = await updateVendor(changedFields)
 
         if (res.success)
@@ -59,8 +64,9 @@ const VendorSettingsProvider = ({ children }: Record<"children", React.ReactNode
         value={{
             vendorSettingsQueryState: {
                 isError, isPending, queryResponseData: vendorData, error, isChanged,
-                handleSubmit,
-                handleChange
+                handleSubmit: handleSubmit,
+                onSubmit,
+                handleChange: register
             },
 
         }}

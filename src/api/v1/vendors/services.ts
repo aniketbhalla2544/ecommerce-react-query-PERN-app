@@ -9,7 +9,16 @@ async function getVendor<T extends VendorKeys>(field: T, value: Vendor[T]) {
     values: [value],
   });
 }
+async function updateVendor(queryString:string, vendorId :number) {  
+  return await pgquery({
+    text: `UPDATE vendors
+    SET  ${queryString}
+    WHERE vendor_id = ${vendorId}
+    `, 
+  }); 
+}
 
 export const vendorServices = {
   getVendor,
+  updateVendor
 };

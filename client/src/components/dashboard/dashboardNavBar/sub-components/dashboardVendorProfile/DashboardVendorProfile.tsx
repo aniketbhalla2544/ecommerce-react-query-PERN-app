@@ -17,7 +17,7 @@ const VENDOR_PROFILE_IMG_URL =
 const DashboardVendorProfile = () => {
   const [showActionPopover, setShowActionPopover] = React.useState(false);
   const { vendorEmail } = useAppStore((state) => ({
-    vendorName: state.vendor.fullname?.trim(),
+    vendorName: state.vendor.fullname.trim(),
     vendorEmail: state.vendor.email,
   }));
 
@@ -64,7 +64,7 @@ const DashboardVendorProfile = () => {
               </span>{' '}
               <span>Public website</span>
             </NavLink>
-            <NavLink path={appRoutes.dashboard.SETTINGS}>
+            <NavLink path={appRoutes.dashboard.DASHBOARD}>
               <IoSettingsOutline /> <span>Settings</span>
             </NavLink>
             <li>

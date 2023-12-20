@@ -2,6 +2,7 @@
 import { isHttpError } from 'http-errors';
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
+import { getZodValidationIssues } from '../utils/errorHandlingUtils';
 
 const DEFAULT_ERROR_NAME = 'Internal Server Error';
 export const INVALID_ROUTE_MSG = 'Request to invalid route';
@@ -9,6 +10,8 @@ export const INVALID_ROUTE_MSG = 'Request to invalid route';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunction) => {
   // ✔️ catching 'http-errors' package generated errors
+
+  // console.log('catched error: ', err);
   if (isHttpError(err)) {
     const exposedToClient = err.expose; // by default expose is true
     if (exposedToClient) {
@@ -23,23 +26,19 @@ const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunct
         status,
       };
       console.log(httpError);
-      // apploggers.jsonLogger.error(httpError);
       return res.status(status).json(httpError);
     }
   }
 
   // ✔️ catching zod validation errors
   if (err instanceof ZodError) {
-    const issues = err.issues;
-    const validationErrorMessages = [];
-    for (const issue of issues) {
-      validationErrorMessages.push(issue.message);
-    }
+    const errors = getZodValidationIssues(err);
+    console.log('received erros: ', errors);
     const errorResponse = {
       status: 400,
       success: false,
       name: 'Validation Error',
-      validationErrorMessages,
+      errors,
     };
     console.log(errorResponse);
     return res.status(400).json(errorResponse);
@@ -55,7 +54,6 @@ const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunct
         requestedPath: req.originalUrl,
       };
       console.log(invalidRouteRequestError);
-      // apploggers.jsonLogger.error(invalidRouteRequestError);
       return res.status(400).json(invalidRouteRequestError);
     }
   }
@@ -69,7 +67,6 @@ const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunct
     msg: generalErrorMsg,
   };
   console.log(error);
-  // apploggers.jsonLogger.error(error);
   return res.status(500).json(error);
 };
 

@@ -1,12 +1,16 @@
 import express from 'express';
 import { vendorControllersV1 } from './controllers';
-import validateRegisteredVendor from './middlewares/validateRegisteredVendor';
 import checkVendorAuthorization from '../../../middlewares/checkVendorAuthorization';
+import validateToBeRegisteredVendor from './middlewares/validateToBeRegisteredVendor';
 const vendorRouterV1 = express.Router();
+
+/**
+ * Must validate route data input before hitting controllers
+ */
 
 vendorRouterV1.post(
   '/register',
-  [validateRegisteredVendor],
+  [validateToBeRegisteredVendor],
   vendorControllersV1.registerVendor
 );
 

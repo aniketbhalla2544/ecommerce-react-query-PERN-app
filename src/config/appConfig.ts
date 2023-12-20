@@ -13,9 +13,12 @@ const login = {
   refreshAccessToken: {
     secretKey: env.VENDOR_LOGIN_REFRESH_TOKEN_SECRET_KEY,
     cookieName: 'login-refresh',
+    tokenExpiry: '7d',
+    cookieMaxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
   },
   accessToken: {
     secretKey: env.VENDOR_LOGIN_ACCESS_TOKEN_SECRET_KEY,
+    tokenExpiry: '1d',
   },
 };
 

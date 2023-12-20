@@ -1,0 +1,12 @@
+{
+  "watch": [
+    "src/**/*.ts"
+  ],
+  "ext": "ts",
+  "ignore": [
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ],
+  "exec": "ts-node ./src/server.ts",
+  "signal": "SIGUSR2"
+}

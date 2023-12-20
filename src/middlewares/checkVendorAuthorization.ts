@@ -1,65 +1,59 @@
 import { NextFunction, Request, Response } from 'express';
 import createHttpError from 'http-errors';
 import jwt from 'jsonwebtoken';
-import validator from 'validator';
 import { vendorServices } from '../api/v1/vendors/services';
-import { z } from 'zod';
 import { getZodValidationIssues, isZodError } from '../utils/errorHandlingUtils';
 import appConfig from '../config/appConfig';
-import { Vendor } from '../types/vendor';
+import { Vendor } from '@prisma/client';
+import validator from 'validator';
+import {
+  JwtDecodedVendor,
+  jwtDecodedVendorSchema,
+} from '../validation-schemas/vendor/jwt-decoded-vendor';
+import { refreshAccessTokenCookieName } from '../api/v1/auth/controllers';
 
 const checkVendorAuthorization = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const authHeader = req.headers.authorization;
-  const doesAuthHeaderHasBearerKeyword = !!authHeader?.includes('Bearer');
-  const authHeaderHasValidJwtToken = validator.isJWT(authHeader?.split(' ')[1] ?? '');
-
-  // ✅ validating auth header
-  if (!authHeader || !doesAuthHeaderHasBearerKeyword || !authHeaderHasValidJwtToken) {
-    console.log('Error checkVendorAuth: invalid auth header, header: ', authHeader);
-    throw createHttpError(401, 'Unauthorized request');
-  }
-
+  const accessJwtToken = validateAuthHeaderAndGetJWTToken(req);
   try {
-    const accessJwtToken = authHeader.split(' ')[1].trim();
-    // console.log('--- JWT Token: ', accessJwtToken);
-    const decodedVendor = (await verifyLoginAccessToken(accessJwtToken)) as unknown;
-
-    //  ✅ validation of decoded user
+    const decodedVendor: unknown = await verifyLoginAccessToken(accessJwtToken);
     const validatedDecodedVendor = await validateDecodedVendor(decodedVendor);
     const { id: vendorId } = validatedDecodedVendor;
-    // console.log('decodedVendor: ', decodedVendor);
 
     // ✅ checking vendor existence
-    const { rowCount, rows } = await vendorServices.getVendor('vendor_id', vendorId);
-    if (!rowCount || !rows.length) {
-      console.log(`Error checkVendorAuth: vendor with id= ${vendorId} doesn't exists`);
+    const existingVendor = await vendorServices.getVendorById(vendorId);
+    if (!existingVendor) {
+      console.log(`[Error checkVendorAuth]: vendor with id= ${vendorId} doesn't exists`);
       throw createHttpError(401, 'Unauthorized request');
     }
-    const existingVendor = rows[0] as Vendor;
 
-    // console.log('loggedin as: ', existingVendor.fullname);
+    // vendor property access to all the app controllers
     res.locals.vendor = existingVendor;
-
     next();
   } catch (error) {
+    // clearing refresh access token http-only cookie from frontend / client.
+    res.clearCookie(refreshAccessTokenCookieName);
+
     // ✅ handling jwt token errors
     if (
       error instanceof jwt.JsonWebTokenError ||
       error instanceof jwt.NotBeforeError ||
       error instanceof jwt.TokenExpiredError
     ) {
-      console.log('Error checkVendorAuth: Invalid jwt token found, error: ', error);
+      console.log(
+        '[Error checkVendorAuth]: Invalid jwt token found, error: ',
+        error.message
+      );
       throw createHttpError(401, 'Unauthorized request');
     }
     // ✅ handling decoded vendor zod validation issues
     if (isZodError(error)) {
       const issues = getZodValidationIssues(error);
       console.log(
-        'Error checkVendorAuth: Invalid type decoded user found in jwt token, issues: ',
+        '[Error checkVendorAuth]: Invalid type decoded user found in jwt token, issues: ',
         issues
       );
       throw createHttpError(401, 'Unauthorized request');
@@ -91,26 +85,15 @@ async function verifyLoginAccessToken(loginAccessToken: string) {
 }
 
 // ------------- validateDecodedVendor
-const ValidDecodedVendorSchema = z.object({
-  id: z.number().min(1),
-  email: z.string().trim().email(),
-  slug: z.string().trim().min(4),
-  iat: z.number(),
-  exp: z.number(),
-});
-
-type ValidDecodedVendor = z.infer<typeof ValidDecodedVendorSchema>;
-
-async function validateDecodedVendor(vendor: unknown): Promise<ValidDecodedVendor> {
-  const validatedSchema = await ValidDecodedVendorSchema.parseAsync(vendor);
-  return validatedSchema;
+async function validateDecodedVendor(vendor: unknown): Promise<JwtDecodedVendor> {
+  return await jwtDecodedVendorSchema.parseAsync(vendor);
 }
 
 //  ----------- utils
-// const vendorId = getLoggedInVendorId(res);
-export function getLoggedInVendorId(res: Response) {
-  const loggedInVendorId = res.locals.vendor['vendor_id'] as Vendor['vendor_id'];
-  if (!+loggedInVendorId) {
+export function getLoggedInVendorId(res: Response): number {
+  const loggedInVendor: Vendor | undefined = res.locals.vendor;
+  const loggedInVendorId = loggedInVendor?.id;
+  if (!loggedInVendorId || !+loggedInVendorId) {
     console.log(
       `Error getLoggedInVendorId(): vendor id not found, current vendor id: `,
       loggedInVendorId
@@ -118,4 +101,18 @@ export function getLoggedInVendorId(res: Response) {
     throw createHttpError(401, 'Unauthorized request');
   }
   return loggedInVendorId;
+}
+
+export function validateAuthHeaderAndGetJWTToken(req: Request): string {
+  const authHeader = req.headers.authorization;
+  const doesAuthHeaderHasBearerKeyword = !!authHeader?.includes('Bearer');
+  const authHeaderHasValidJwtToken = validator.isJWT(authHeader?.split(' ')[1] ?? '');
+
+  // ✅ validating auth header
+  if (!authHeader || !doesAuthHeaderHasBearerKeyword || !authHeaderHasValidJwtToken) {
+    console.log('Error checkVendorAuth: invalid auth header, header: ', authHeader);
+    throw createHttpError(401, 'Unauthorized request');
+  }
+  const jwtToken = authHeader.split(' ')[1].trim();
+  return jwtToken;
 }

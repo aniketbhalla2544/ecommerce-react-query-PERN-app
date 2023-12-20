@@ -1,11 +1,12 @@
 import React, { useEffect } from "react"
 import { updatedSettingsState, vendorSettingsStateContextType } from "./vendorSettingsContextTypes"
-import { updateVendor } from "../../../../api/vendor";
+import { deleteVendor, getVendor, updateVendor } from "../../../../api/vendor";
 import toast from "react-hot-toast";
 import useAppStore from "../../../../stores/zustand/appStore";
 import { useForm } from "react-hook-form";
 import { Vendor } from "../../../../types/vendor";
 import { AxiosError } from "axios";
+import { resetAppState } from "../../../../utils/auth.utils";
 
 export const VendorSettingsContext = React.createContext<vendorSettingsStateContextType | null>(null);
 // provider for vendros setting page
@@ -50,6 +51,14 @@ const VendorSettingsProvider = ({ children }: Record<"children", React.ReactNode
         // // to remove save button 
         // setIsChanged(false) 
     }
+    const handleDelete = async () => {
+        const { vendorId } = vendorData;
+        const data = await deleteVendor(vendorId);
+        if (!!data && data.success) {
+            toast("account deletion Success ✅")
+            resetAppState();
+        }
+    }
 
     // 
     return <VendorSettingsContext.Provider
@@ -57,6 +66,7 @@ const VendorSettingsProvider = ({ children }: Record<"children", React.ReactNode
             vendorSettingsQueryState: {
                 queryResponseData: vendorData,
                 handleSubmit,
+                handleDelete,
                 register,
                 onSubmit,
                 errors

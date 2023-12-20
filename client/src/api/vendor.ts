@@ -23,9 +23,14 @@ export type GetVendorResponse = {
   success: boolean;
   data: Vendor;
 };
-// changed data.data to data cz need the whole Res.
+
 export const getVendor = async () => {
   const { data } = await apiClient.get<GetVendorResponse>('/vendors/');
+  return data.data;
+};
+
+export const deleteVendor = async (vendorId:string) => {
+  const data  = await apiClient.post('/vendors/delete' , {vendorId}); 
   return data.data;
 };
 

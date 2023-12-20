@@ -119,7 +119,8 @@ const useVendorSignin = () => {
         password,
       });
       setAccessToken(loginAccessToken);
-      const vendor = await getVendor();
+      const vendor = await getVendor(); 
+      console.log("this is vendor " , vendor)
       setVendor(vendor);
       updateSigninStatus('success');
       toast.success('Vendor loggedin successfully 🫣');

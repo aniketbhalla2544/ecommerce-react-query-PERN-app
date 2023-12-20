@@ -70,17 +70,34 @@ async function updateVendor(req: Request, res: Response) {
   // to remove last quamma
   queryString = queryString.slice(0 , queryString.length -1)
   const requestResponse = await vendorServices.updateVendor(queryString , vendorId )
+  const { rowCount, rows } = requestResponse;
  
   res.json({
-    // success: !!rowCount && !!rows.length,
+    success: !!rowCount && !!rows.length,
     // data: {
     //   email: vendor.email,
     //   fullname: vendor.fullname,
     //   isPremium: vendor.is_premium,
     //   vendorId: String(vendor.vendor_id),
     //   vendorSlug: vendor.vendor_slug,
-    // },
-    success:true
+    // }, 
+  });
+}
+async function deleteVendor(req: Request, res: Response) {
+  const vendorId = getLoggedInVendorId(res);
+  
+  const requestResponse = await vendorServices.deleteVendor(vendorId )
+  const { rowCount, rows } = requestResponse;
+  
+  res.json({
+    success: !!rowCount ,
+    // data: {
+    //   email: vendor.email,
+    //   fullname: vendor.fullname,
+    //   isPremium: vendor.is_premium,
+    //   vendorId: String(vendor.vendor_id),
+    //   vendorSlug: vendor.vendor_slug,
+    // }, 
   });
 }
 
@@ -88,4 +105,5 @@ export const vendorControllersV1 = {
   registerVendor,
   getVendor,
   updateVendor,
+  deleteVendor,
 };

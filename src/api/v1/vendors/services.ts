@@ -17,8 +17,21 @@ async function updateVendor(queryString:string, vendorId :number) {
     `, 
   }); 
 }
+async function deleteVendor( vendorId :number) {  
+  await pgquery({
+    text: `DELETE  FROM products
+    WHERE vendor_id = ${vendorId}
+    `, 
+  });
+  return await pgquery({
+    text: `DELETE FROM vendors
+    WHERE vendor_id = ${vendorId}
+    `, 
+  });
+}
 
 export const vendorServices = {
   getVendor,
-  updateVendor
+  updateVendor,
+  deleteVendor
 };

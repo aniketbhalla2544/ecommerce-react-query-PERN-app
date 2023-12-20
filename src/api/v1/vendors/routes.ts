@@ -14,5 +14,6 @@ vendorRouterV1.use(checkVendorAuthorization);
 
 vendorRouterV1.get('/', vendorControllersV1.getVendor);
 vendorRouterV1.post('/update', vendorControllersV1.updateVendor);
+vendorRouterV1.post('/delete', vendorControllersV1.deleteVendor);
 
 export default vendorRouterV1;

@@ -8,6 +8,7 @@ type vendorSettingsState = {
       
     register:UseFormRegister<FieldValues>;
     handleSubmit: UseFormHandleSubmit<FieldValues, undefined>; 
+    handleDelete : ()=> void;
     onSubmit : (data:updatedSettingsState)=> void;
     errors:FieldErrors<updatedSettingsState>;
 };

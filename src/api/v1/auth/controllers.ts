@@ -1,99 +1,75 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import createHttpError from 'http-errors';
-import { z } from 'zod';
-import { getZodValidationIssues, isZodError } from '../../../utils/errorHandlingUtils';
 import { vendorServices } from '../vendors/services';
-import { Vendor } from '../../../types/vendor';
 import jwt from 'jsonwebtoken';
 import { isProductionEnv } from '../../../utils/helpers';
 import appConfig from '../../../config/appConfig';
+import { SigninCredentials } from './middlewares/validateSigninCredentials';
+import { JwtDecodedVendor } from '../../../validation-schemas/vendor/jwt-decoded-vendor';
 
-const MINS_10 = 1000 * 60 * 10;
-const refreshAccessTokenCookieName = appConfig.vendor.login.refreshAccessToken.cookieName;
+export const refreshAccessTokenCookieName =
+  appConfig.vendor.login.refreshAccessToken.cookieName;
 
+type JWTTokenPayload = Pick<JwtDecodedVendor, 'id' | 'email' | 'vendorSlug'>;
+
+// sign-in with email & password
 async function signinVendor(req: Request, res: Response) {
-  const authHeader = req.headers.authorization;
-  const doesAuthHeaderhasBasicKeyword = !!authHeader?.includes('Basic');
-  const encodedCredentials = authHeader?.split(' ')[1];
-
-  // ✅ validating basic Authorization header
-  if (
-    !authHeader ||
-    !doesAuthHeaderhasBasicKeyword ||
-    !encodedCredentials ||
-    !(encodedCredentials?.length ?? 0)
-  ) {
-    console.log('Error signinVendor: Invalid authorization header, header: ', authHeader);
-    throw createHttpError(401, 'Unauthorized request');
-  }
+  const { email, password } = res.locals.validatedSigninCredentials as SigninCredentials;
 
   try {
-    // ✅ validating login credentials
-    const decodedCredentials = atob(encodedCredentials).split(':');
-    const [email, password] = decodedCredentials;
-
-    const CredentialsSchema = z.object({
-      email: z.string().trim().email(),
-      password: z.string().min(1),
-    });
-    const validatedCredentials = await CredentialsSchema.parseAsync({
-      email,
-      password,
-    });
-    const { email: validatedEmail, password: validatedPassword } = validatedCredentials;
-
-    // ✅ for existing vendor with the email
-    const queryResponse = await vendorServices.getVendor('email', validatedEmail);
-    const { rowCount, rows } = queryResponse;
-    if (!rowCount) {
+    // ✅ check for existing vendor with the email
+    const vendor = await vendorServices.getVendorByEmail(email);
+    if (!vendor) {
       console.log(
-        `Error signinVendor: no existing vendor with email ${validatedEmail} found in the records.`
+        `Error signinVendor: no existing vendor with email ${email} found in the records.`
       );
       throw createHttpError(400, 'Invalid credentials', {
         invalidCredentials: true,
       });
     }
-    const vendor = rows[0] as Vendor;
-    const { hash_password } = vendor;
 
     // ✅ check vendor password
-    const passwordMatched = await bcrypt.compare(validatedPassword, hash_password);
+    const passwordMatched = await bcrypt.compare(password, vendor.password);
     if (!passwordMatched) {
       console.log(
-        `Error signinVendor: password doesn't match for vendor with email: ${validatedEmail}`
+        `Error signinVendor: password doesn't match for vendor with email: ${email}`
       );
       throw createHttpError(401, 'Unauthorized request', {
         invalidCredentials: true,
       });
     }
 
-    // ☑️ creating and setting jwt login refresh token
+    /**
+     * creating login refresh jwt access token
+     * and setting it to http only cookie
+     */
     const loginRefreshAccessTokenSecretKey =
       appConfig.vendor.login.refreshAccessToken.secretKey;
-    appConfig.vendor.login;
+
     if (!loginRefreshAccessTokenSecretKey) {
       console.log(
         'Error signinVendor: loginRefreshAccessTokenSecretKey not found while signing in vendor'
       );
       throw createHttpError(500, 'Error while signing in');
     }
+    const refreshLoginAccessTokenPayload: JWTTokenPayload = {
+      id: vendor.id,
+      email: vendor.email,
+      vendorSlug: vendor.vendorSlug,
+    };
     const refreshToken = jwt.sign(
-      {
-        id: vendor.vendor_id,
-        email: vendor.email,
-        slug: vendor.vendor_slug,
-      },
+      refreshLoginAccessTokenPayload,
       loginRefreshAccessTokenSecretKey,
       {
-        expiresIn: '7d',
+        expiresIn: appConfig.vendor.login.refreshAccessToken.tokenExpiry,
       }
     );
 
     res.cookie(refreshAccessTokenCookieName, refreshToken, {
       httpOnly: true,
       secure: isProductionEnv,
-      maxAge: MINS_10,
+      maxAge: appConfig.vendor.login.refreshAccessToken.cookieMaxAge,
     });
 
     // ☑️ creating jwt login access token
@@ -104,37 +80,27 @@ async function signinVendor(req: Request, res: Response) {
       );
       throw createHttpError(500, 'Error while signing in');
     }
+    const loginAccessTokenPayload: JWTTokenPayload = {
+      id: vendor.id,
+      email: vendor.email,
+      vendorSlug: vendor.vendorSlug,
+    };
+
     const loginAccessToken = jwt.sign(
-      {
-        id: vendor.vendor_id,
-        email: vendor.email,
-        slug: vendor.vendor_slug,
-      },
+      loginAccessTokenPayload,
       loginAccessTokenSecretKey,
       {
-        expiresIn: '1d',
+        expiresIn: appConfig.vendor.login.accessToken.tokenExpiry,
       }
     );
 
     res.json({
-      success: !!rowCount && passwordMatched && !!vendor,
+      success: !!vendor && passwordMatched,
       loginAccessToken,
     });
   } catch (e) {
     // ☑️ removing http only cookie
     res.clearCookie(refreshAccessTokenCookieName);
-
-    // catching zod validation errors
-    if (isZodError(e)) {
-      const credentialsTypeIssues = getZodValidationIssues(e);
-      console.log(
-        'Error signinVendor: Invalid type credentials found, error: ',
-        credentialsTypeIssues
-      );
-      throw createHttpError(400, 'Invalid type credentials', {
-        invalidTypeCredentials: true,
-      });
-    }
     throw e;
   }
 }

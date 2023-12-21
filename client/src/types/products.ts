@@ -1,12 +1,12 @@
 export type Product = {
-  product_id: number;
+  id: number;
   title: string;
   price: number;
   description: string;
-  image: null | string;
+  image: string;
+  isArchived: boolean;
+  vendorId: number;
 };
-
-export type ProductWithNoProductId = Omit<Product, 'product_id'>;
 
 export type Products = Product[];
 

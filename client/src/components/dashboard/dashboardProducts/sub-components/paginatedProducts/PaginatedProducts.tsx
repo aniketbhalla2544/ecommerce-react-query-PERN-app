@@ -76,9 +76,9 @@ function PaginatedProductsWithContext() {
             <TableColumns />
             <tbody>
               {products.map((product, index) => {
-                const isProductSelected = productsState.selectedProducts.includes(
-                  product.product_id
-                );
+                const productId = product.id;
+                const isProductSelected =
+                  productsState.selectedProducts.includes(productId);
                 const uniqueItemKey = `${index}-${isProductSelected}`;
                 return (
                   <tr
@@ -95,12 +95,12 @@ function PaginatedProductsWithContext() {
                         type='checkbox'
                         checked={isProductSelected}
                         name='product-selection'
-                        value={product.product_id as number}
-                        id={String(product.product_id)}
+                        value={productId as number}
+                        id={String(productId)}
                         className='hover:cursor-pointer w-[15px] h-[15px] align-middle'
                       />
                     </td>
-                    <td className='px-4 text-gray-500'>{product.product_id}</td>
+                    <td className='px-4 text-gray-500'>{productId}</td>
                     <td>
                       <div className='w-4 h-4'>
                         <img
@@ -150,7 +150,7 @@ function PaginatedProductsWithContext() {
                         }`}
                         onClick={() =>
                           deleteProductModalState.handleDeleteProductTrashBtnIconClick(
-                            product.product_id
+                            productId
                           )
                         }
                       >
@@ -161,9 +161,7 @@ function PaginatedProductsWithContext() {
                       <button
                         disabled={productsState.isProductSelectionEditState}
                         onClick={() =>
-                          updateProductModalState.handleUpdateProductIconClick(
-                            product.product_id
-                          )
+                          updateProductModalState.handleUpdateProductIconClick(productId)
                         }
                         className={`p-2 ${
                           productsState.isProductSelectionEditState

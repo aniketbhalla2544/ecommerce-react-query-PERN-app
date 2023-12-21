@@ -36,7 +36,7 @@ const useVendorSignin = () => {
     accessToken: state.accessToken,
     setAccessToken: state.setAccessToken,
   }));
-  const vendorId = vendor.vendorId;
+  const vendorId = vendor.id;
   const navigate = useNavigate();
   const [formState, setFormState] = React.useState<FormState>(initialFormState);
   const { email, password, errors, signinStatus } = formState;
@@ -118,9 +118,9 @@ const useVendorSignin = () => {
         email,
         password,
       });
-      setAccessToken(loginAccessToken);
+      setAccessToken(loginAccessToken); // in zustand app store
       const vendor = await getVendor();
-      setVendor(vendor);
+      setVendor(vendor); // in zustand app store
       updateSigninStatus('success');
       toast.success('Vendor loggedin successfully 🫣');
     } catch (error) {
@@ -164,11 +164,11 @@ const useVendorSignin = () => {
     }
   }, [accessToken, vendorId, navigate]);
 
-  React.useEffect(() => {
-    console.log({
-      errors,
-    });
-  }, [errors]);
+  // React.useEffect(() => {
+  //   console.log({
+  //     errors,
+  //   });
+  // }, [errors]);
 
   return {
     validationState: {

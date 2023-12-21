@@ -21,7 +21,8 @@ export const imageFileTypeSchema = z.custom<File>(
     return isValid;
   },
   {
-    message: 'invalid uploaded file type of product img, required file type is image',
+    message:
+      'image required or invalid uploaded file type, expected file of mime-type image',
   }
 );
 

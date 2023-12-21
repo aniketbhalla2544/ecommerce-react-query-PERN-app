@@ -75,7 +75,7 @@ const DashboardSettings = () => {
                         <button
                             type="button"
                             onClick={() => setIsDeleting(true)}
-                            className="p-2 mt-2 text-white  border border-black-50 rounded-lg bg-red-600 hover:bg-red-500 transition duration-300 ease-in-out "
+                            className="p-2 mt-2 text-white  border border-black-50 rounded-lg bg-red-600 hover:bg-red-500gt  transition duration-300 ease-in-out "
 
                         >Delete Account</button>
                     </span>

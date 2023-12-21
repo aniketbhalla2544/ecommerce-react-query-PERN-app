@@ -64,6 +64,7 @@ async function updateVendor(req: Request, res: Response) {
   console.log(vendorId)
   const keys = Object.keys(req.body)
   let queryString = "";
+  
   for(const key of keys){
     queryString +=key+"="+`'${req.body[key]}',`
   }

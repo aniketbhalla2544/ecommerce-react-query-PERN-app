@@ -12,7 +12,7 @@ async function getVendor<T extends VendorKeys>(field: T, value: Vendor[T]) {
 async function updateVendor(queryString:string, vendorId :number) {  
   return await pgquery({
     text: `UPDATE vendors
-    SET  ${queryString}
+    SET  ${queryString} 
     WHERE vendor_id = ${vendorId}
     `, 
   }); 

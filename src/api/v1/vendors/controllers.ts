@@ -1,61 +1,50 @@
 import { Request, Response } from 'express';
 import createHttpError from 'http-errors';
-import { ValidatedRegisteredVendor } from './validations/vendorRegisterationDataValidationSchema';
-import { pgquery } from '../../../db';
-import { vendorServices } from './services';
-import { Vendor } from '../../../types/vendor';
 import { getLoggedInVendorId } from '../../../middlewares/checkVendorAuthorization';
+import { vendorServices } from './services';
+import { CreateVendor } from '../../../validation-schemas/vendor/create';
+import { Vendor } from '../../../validation-schemas/vendor/vendor';
 
 async function registerVendor(req: Request, res: Response) {
-  const validatedRegisteredVendor = res.locals.validatedRegisteredVendor as
-    | ValidatedRegisteredVendor
-    | undefined;
+  const validatedVendor = res.locals.validatedVendor as CreateVendor;
 
-  // ✅ checking validatedRegisteredVendor
-  if (!validatedRegisteredVendor) {
-    throw createHttpError(
-      404,
-      'validatedRegisteredVendor data not found for vendor registeration.'
-    );
-  }
-
-  // ✅ inserting vendor
-  const { vendor_slug, email, fullname, hash_password } = validatedRegisteredVendor;
-  const getProductQueryResult = await pgquery({
-    text: `INSERT INTO vendors (vendor_slug, email, fullname, hash_password)
-    VALUES ($1, $2, $3, $4) RETURNING vendor_slug;`,
-    values: [vendor_slug, email, fullname, hash_password],
+  // ✅ creating vendor
+  const registeredVendor = await vendorServices.createVendor({
+    email: validatedVendor.email,
+    fullname: validatedVendor.fullname,
+    password: validatedVendor.password,
   });
-  const { rowCount, rows } = getProductQueryResult;
-  if (!rowCount) {
-    throw createHttpError(500, 'Error while inserting vendor.');
-  }
-  const insertedVendor = rows[0];
 
   res.json({
-    success: !!rowCount,
-    msg: 'Vendor registered',
+    success: !!registeredVendor,
+    msg: 'Vendor registered successfully',
     data: {
-      vendorSlug: insertedVendor.vendor_slug,
+      vendorSlug: registeredVendor.vendorSlug,
     },
   });
 }
 
 async function getVendor(req: Request, res: Response) {
   const vendorId = getLoggedInVendorId(res);
-  const requestResponse = await vendorServices.getVendor('vendor_id', vendorId);
-  const { rowCount, rows } = requestResponse;
-  const vendor = rows[0] as Vendor;
+  const foundVendor = await vendorServices.getVendorById(vendorId);
+  if (!foundVendor) {
+    console.log(`[getVendor error]: vendor with id: ${vendorId} not found`);
+    throw createHttpError(404, 'Vendor not found', {
+      vendorId,
+    });
+  }
+
+  const vendor: Partial<Vendor> = {
+    id: String(foundVendor.id) as unknown as number,
+    email: foundVendor.email,
+    fullname: foundVendor.fullname,
+    isPremium: foundVendor.isPremium,
+    vendorSlug: foundVendor.vendorSlug,
+  };
 
   res.json({
-    success: !!rowCount && !!rows.length,
-    data: {
-      email: vendor.email,
-      fullname: vendor.fullname,
-      isPremium: vendor.is_premium,
-      vendorId: String(vendor.vendor_id),
-      vendorSlug: vendor.vendor_slug,
-    },
+    success: !!foundVendor,
+    data: vendor,
   });
 }
 

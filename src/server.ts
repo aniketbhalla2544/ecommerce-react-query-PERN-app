@@ -29,32 +29,29 @@ app.use(cookieParser());
 app.use(helmet());
 cloudinary.config(appConfig.cloudinary);
 
-function init() {
-  // routes
-  app.get('/', (req, res) => {
-    return res.json({
-      msg: 'Vendor server running',
-    });
+// routes
+app.get('/', async (req, res) => {
+  return res.json({
+    msg: 'Vendor server running',
   });
+});
 
-  app.get('/api', async (_req, res) => {
-    return res.json({
-      success: true,
-      msg: 'Vendor server running',
-    });
+app.get('/api', async (_req, res) => {
+  return res.json({
+    success: true,
+    msg: 'Vendor server running',
   });
+});
 
-  app.use(appRouter);
+app.use(appRouter);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  app.all('*', (_req, _res, next) => {
-    next(new Error(INVALID_ROUTE_MSG));
-  });
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.all('*', (_req, _res, next) => {
+  next(new Error(INVALID_ROUTE_MSG));
+});
 
-  app.use(errorHandler);
-}
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Express server running on PORT: ${PORT}`);
-  init();
 });

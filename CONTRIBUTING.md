@@ -57,9 +57,16 @@ If everything went well, the frontend should be running on http://localhost:5173
 
 If one wants to change the PORT number of server app then must update the SERVER_PORT variable in `vite.config.ts` file of the `client` directory.
 
----
+---****
 
 <br/>
+
+## Prisma
+### Handling migrations locally
+- Update `schema.prisma` file with any model schema changes.
+- In the root directory, run `cd tools`
+- Run `npx prisma migrate dev --name <migration-name>`
+- Update prisma client, run `npm run prisma:generate`
 
 ## Pushing changes to the app
 

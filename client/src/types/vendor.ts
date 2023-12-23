@@ -2,7 +2,7 @@ export type Vendor = {
   email: string;
   fullname: string;
   isPremium: boolean;
-  vendorId: string;
+  id: string;
   vendorSlug: string;
 };
 

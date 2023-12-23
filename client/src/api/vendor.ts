@@ -12,10 +12,9 @@ export const registerVendor = async (registerVendor: RegisterVendor) => {
   });
 };
 
-export const updateVendor = async (fieldsChanged:updatedSettingsState)=>{
-    const { email, fullname , isPremium , vendorId , vendorSlug:vendor_slug } = fieldsChanged;
+export const updateVendor = async (fieldsChanged:updatedSettingsState)=>{ 
     
-    const res = await apiClient.post('/vendors/update' , { email, fullname , isPremium , vendorId , vendor_slug });
+    const res = await apiClient.post('/vendors/update' , { ...fieldsChanged});
     return res.data
 }
 
@@ -25,7 +24,7 @@ export type GetVendorResponse = {
 };
 
 export const getVendor = async () => {
-  const { data } = await apiClient.get<GetVendorResponse>('/vendors/');
+  const { data } = await apiClient.get<GetVendorResponse>('/vendors/'); 
   return data.data;
 };
 

@@ -49,45 +49,35 @@ async function getVendor(req: Request, res: Response) {
 }
 
 async function updateVendor(req: Request, res: Response) {
+  const vendor  = req.body;
   const vendorId = getLoggedInVendorId(res);
-  console.log(vendorId)
-  const keys = Object.keys(req.body)
-  let queryString = "";
-  
-  for(const key of keys){
-    queryString +=key+"="+`'${req.body[key]}',`
-  }
-  // to remove last quamma
-  queryString = queryString.slice(0 , queryString.length -1)
-  const requestResponse = await vendorServices.updateVendor(queryString , vendorId )
-  const { rowCount, rows } = requestResponse;
- 
+  const updated = await vendorServices.updateVendor(vendor , vendorId)
+   
   res.json({
-    success: !!rowCount && !!rows.length,
-    // data: {
-    //   email: vendor.email,
-    //   fullname: vendor.fullname,
-    //   isPremium: vendor.is_premium,
-    //   vendorId: String(vendor.vendor_id),
-    //   vendorSlug: vendor.vendor_slug,
-    // }, 
+    success: true  ,
+    data: {
+      email: vendor.email,
+      fullname: vendor.fullname,
+      isPremium: vendor.is_premium,
+      vendorId: String(vendor.vendor_id),
+      vendorSlug: vendor.vendor_slug,
+    }, 
   });
 }
 async function deleteVendor(req: Request, res: Response) {
+  const vendor  = req.body;
   const vendorId = getLoggedInVendorId(res);
-  
-  const requestResponse = await vendorServices.deleteVendor(vendorId )
-  const { rowCount, rows } = requestResponse;
-  
+  const deleted = await vendorServices.deleteVendor(vendorId)
+   
   res.json({
-    success: !!rowCount ,
-    // data: {
-    //   email: vendor.email,
-    //   fullname: vendor.fullname,
-    //   isPremium: vendor.is_premium,
-    //   vendorId: String(vendor.vendor_id),
-    //   vendorSlug: vendor.vendor_slug,
-    // }, 
+    success: true  ,
+    data: {
+      email: deleted.email,
+      fullname: deleted.fullname,
+      isPremium: deleted.isPremium,
+      vendorId: String(deleted.id),
+      vendorSlug: deleted.vendorSlug,
+    }, 
   });
 }
 

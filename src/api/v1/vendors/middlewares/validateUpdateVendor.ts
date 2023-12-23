@@ -15,7 +15,7 @@ const validateUpdateVendor = async (
   // ✅ check existing vendor with slug
   if(validatedVendor.vendorSlug){
       const vendor = await vendorServices.getVendorBySlug(validatedVendor.vendorSlug);
-      console.log(vendor)
+ 
       if (vendor && vendor?.id != getLoggedInVendorId(res)) {
             throw createHttpError(409, 'A vendor with this slug already exists.', {
               vendorSlug: validatedVendor.vendorSlug,
@@ -23,6 +23,17 @@ const validateUpdateVendor = async (
             });
           }
   }
+  if(validatedVendor.email){
+    const vendor = await vendorServices.getVendorByEmail(validatedVendor.email);
+ 
+    if (vendor && vendor?.id != getLoggedInVendorId(res)) {
+          throw createHttpError(409, 'A vendor with this email already exists.', {
+            email: validatedVendor.email,
+            isVendorConflictError: true,
+          });
+        }
+}
+
   
 
   res.locals.validatedVendor = validatedVendor;

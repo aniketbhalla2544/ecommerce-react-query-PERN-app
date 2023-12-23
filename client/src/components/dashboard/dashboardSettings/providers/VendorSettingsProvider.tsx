@@ -30,16 +30,21 @@ const VendorSettingsProvider = ({ children }: Record<"children", React.ReactNode
 
         try {
             const res = await updateVendor(data)
+            console.log({ res })
             if (res.success) {
                 toast("Settings updated ! ✅")
                 useAppStore.setState({ vendor: data as Vendor })
             }
         } catch (e) {
             let error = ""
+            console.log({ e })
             if (e instanceof AxiosError) {
-                error = e.response?.data.msg
-                if (error.includes("duplicate")) {
+                error = e.response?.data?.message
+                if (error.includes("slug already exists")) {
                     setError("vendorSlug", { type: "custom", message: "Vendor slug is not available" })
+                }
+                if (error.includes("email already exists.")) {
+                    setError("email", { type: "custom", message: "Vendor email already exists." })
                 }
             }
 
@@ -52,8 +57,8 @@ const VendorSettingsProvider = ({ children }: Record<"children", React.ReactNode
         // setIsChanged(false) 
     }
     const handleDelete = async () => {
-        const { vendorId } = vendorData;
-        const data = await deleteVendor(vendorId);
+        const { id } = vendorData;
+        const data = await deleteVendor(id);
         if (!!data && data.success) {
             toast("account deletion Success ✅")
             resetAppState();

@@ -14,7 +14,7 @@ type vendorSettingsState = {
 };
  
 export type updatedSettingsState = Partial<
-  Pick<Vendor, 'email' | 'fullname' | 'isPremium' | 'vendorId' |'vendorSlug'>
+  Pick<Vendor, 'email' | 'fullname' | 'isPremium' | 'id' |'vendorSlug'>
 >;
 
 

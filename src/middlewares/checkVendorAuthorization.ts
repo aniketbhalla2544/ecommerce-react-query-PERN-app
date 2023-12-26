@@ -1,11 +1,12 @@
+import { Vendor } from '@prisma/client';
+import jwt from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
 import createHttpError from 'http-errors';
-import jwt from 'jsonwebtoken';
+import isJWT from 'validator/lib/isJWT';
+
 import { vendorServices } from '../api/v1/vendors/services';
 import { getZodValidationIssues, isZodError } from '../utils/errorHandlingUtils';
 import appConfig from '../config/appConfig';
-import { Vendor } from '@prisma/client';
-import validator from 'validator';
 import {
   JwtDecodedVendor,
   jwtDecodedVendorSchema,
@@ -106,7 +107,7 @@ export function getLoggedInVendorId(res: Response): number {
 export function validateAuthHeaderAndGetJWTToken(req: Request): string {
   const authHeader = req.headers.authorization;
   const doesAuthHeaderHasBearerKeyword = !!authHeader?.includes('Bearer');
-  const authHeaderHasValidJwtToken = validator.isJWT(authHeader?.split(' ')[1] ?? '');
+  const authHeaderHasValidJwtToken = isJWT(authHeader?.split(' ')[1] ?? '');
 
   // ✅ validating auth header
   if (!authHeader || !doesAuthHeaderHasBearerKeyword || !authHeaderHasValidJwtToken) {

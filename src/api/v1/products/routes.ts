@@ -1,5 +1,6 @@
 import express from 'express';
 const productsRouterV1 = express.Router();
+
 import { productControllersV1 } from './controllers';
 import multerUpload from '../../../services/multer';
 import checkVendorAuthorization from '../../../middlewares/checkVendorAuthorization';
@@ -9,9 +10,7 @@ import { validateGetProduct } from './middlewares/validateGetProduct';
 import { validateGetAllProducts } from './middlewares/validateGetAllProducts';
 import { validateUpdateProduct } from './middlewares/validateUpdateProduct';
 
-/**
- * Must validate route data input before hitting controllers
- */
+/** Must validate route data input before hitting controllers */
 
 const CREATE_PRODUCT_IMAGE_NAME = 'image'; // should be same as being sent in FormData by frontend code
 

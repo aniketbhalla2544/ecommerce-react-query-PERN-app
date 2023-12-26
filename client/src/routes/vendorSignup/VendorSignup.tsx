@@ -1,4 +1,5 @@
 import { PiWarningLight } from 'react-icons/pi';
+
 import Input from '../../components/utils/Input';
 import useVendorSignup from './hooks/useVendorSignup';
 import Spinner from '../../components/utils/Spinner';

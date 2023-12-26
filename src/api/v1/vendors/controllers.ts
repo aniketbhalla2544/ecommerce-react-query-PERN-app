@@ -48,7 +48,42 @@ async function getVendor(req: Request, res: Response) {
   });
 }
 
+async function updateVendor(req: Request, res: Response) {
+  const vendor  = req.body;
+  const vendorId = getLoggedInVendorId(res);
+  const updated = await vendorServices.updateVendor(vendor , vendorId)
+   
+  res.json({
+    success: true  ,
+    data: {
+      email: vendor.email,
+      fullname: vendor.fullname,
+      isPremium: vendor.is_premium,
+      vendorId: String(vendor.vendor_id),
+      vendorSlug: vendor.vendor_slug,
+    }, 
+  });
+}
+async function deleteVendor(req: Request, res: Response) {
+  const vendor  = req.body;
+  const vendorId = getLoggedInVendorId(res);
+  const deleted = await vendorServices.deleteVendor(vendorId)
+   
+  res.json({
+    success: true  ,
+    data: {
+      email: deleted.email,
+      fullname: deleted.fullname,
+      isPremium: deleted.isPremium,
+      vendorId: String(deleted.id),
+      vendorSlug: deleted.vendorSlug,
+    }, 
+  });
+}
+
 export const vendorControllersV1 = {
   registerVendor,
   getVendor,
+  updateVendor,
+  deleteVendor,
 };

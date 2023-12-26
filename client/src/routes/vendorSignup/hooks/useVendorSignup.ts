@@ -1,11 +1,12 @@
 import React from 'react';
 import toast from 'react-hot-toast';
+import { isAxiosError } from 'axios';
+
 import { getZodValidationIssues } from '../../../utils/errorHandlingUtils';
 import { logger } from '../../../utils/logger';
 import vendorSignupFormZodValidationSchema from '../formZodValidationSchema';
 import { isProductionEnv } from '../../../utils/utils';
 import { registerVendor } from '../../../api/vendor';
-import { isAxiosError } from 'axios';
 import { UknownObject } from '../../../types/general';
 
 type FormStateFields = {

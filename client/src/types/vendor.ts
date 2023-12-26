@@ -4,6 +4,8 @@ export type Vendor = {
   email: string;
   fullname: string;
   isPremium: boolean;
+  id: string;
+  vendorSlug: string;
 };
 
 export type RegisterVendor = Pick<Vendor, 'fullname' | 'email'> & {

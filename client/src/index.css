@@ -18,12 +18,7 @@
   height: 200px;
   background-color: blue;
   border-radius: 50%;
-  clip-path: polygon(
-    50% 50%, 
-    100% 0%, 
-    100% 100%, 
-    0% 100%
-  );
+  clip-path: polygon(50% 50%, 100% 0%, 100% 100%, 0% 100%);
   transform: rotate(-10deg);
 }
 
@@ -33,11 +28,11 @@
   top: 0;
   width: 200px;
   height: 200px;
-  background-color: blue; 
+  background-color: blue;
   border-radius: 100% 65% 100% 76% / 100% 19% 0% 19%;
 }
 
-@layer utilities  {
+@layer utilities {
   .flex-center {
     @apply flex justify-center items-center;
   }
@@ -58,7 +53,7 @@
     @apply text-blue-500;
   }
 
-  .disabled-state{
+  .disabled-state {
     @apply opacity-30 cursor-not-allowed;
   }
 }

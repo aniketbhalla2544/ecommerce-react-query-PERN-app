@@ -9,6 +9,7 @@
     "lint": "eslint . --ext .ts",
     "build": "tsc",
     "prisma:generate": "prisma generate --schema=./tools/prisma/schema.prisma",
+    "prisma:migration-status": "cd tools&& prisma migrate status",
     "local-start": "node dist/src/server.js",
     "test": "echo \"Error: no test specified\"&& exit 1"
   },

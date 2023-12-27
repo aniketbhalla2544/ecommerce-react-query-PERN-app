@@ -31,7 +31,7 @@ const Header = () => {
   const { isVendorLoggedIn } = useAuth();
   return (
     <Container>
-      <div className='py-6 flex justify-between items-center'>
+      <div className='py-6 flex justify-between items-center border-1 border-red-600'>
         <WebsiteIcon />
         {/* navigation items */}
         <div className=''>

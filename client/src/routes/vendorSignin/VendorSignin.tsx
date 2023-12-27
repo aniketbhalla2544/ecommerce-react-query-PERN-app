@@ -1,9 +1,9 @@
 import { PiWarningLight } from 'react-icons/pi';
-import Input from '../../components/utils/Input';
-import Spinner from '../../components/utils/Spinner';
-import IndeterminateProgressBar from '../../components/utils/IndeterminateProgressBar';
 import { Link } from 'react-router-dom';
 import useVendorSignin from './hooks/useVendorSignin';
+import IndeterminateProgressBar from '../../components/utils/IndeterminateProgressBar';
+import Input from '../../components/utils/Input';
+import Spinner from '../../components/utils/Spinner';
 import appRoutes from '../../utils/app.routes';
 
 // TODO: add show password icon to password input

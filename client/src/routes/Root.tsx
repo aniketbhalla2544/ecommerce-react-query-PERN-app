@@ -1,9 +1,11 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet} from 'react-router-dom';
+
 import '../index.css';
 import useAuth from '../hooks/useAuth';
 import appRoutes from '../utils/app.routes';
 import ConditionalRender from '../components/utils/ConditionalRender';
 import DeleteModal from '../components/utils/modals/DeleteModal';
+// import { useEffect } from 'react';
 
 // PROTECTED ROUTES
 

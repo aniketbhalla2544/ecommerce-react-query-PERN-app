@@ -1,6 +1,5 @@
 import React from 'react';
 import toast from 'react-hot-toast';
-import { isAxiosError } from 'axios';
 import vendorSignupFormZodValidationSchema from '../formZodValidationSchema';
 import { UknownObject } from '../../../types/general';
 import { isProductionEnv } from '../../../utils/utils';

@@ -4,12 +4,18 @@ import type { Prisma } from '@prisma/client';
 import prismaClient from '../../../prisma/prismaClientInstance';
 import { CreateVendor } from '../../../validation-schemas/vendor/create';
 import createHttpError from 'http-errors';
+import { pgquery } from '../../../db';
+import { UpdateVendor } from '../../../validation-schemas/vendor/update';
+import { getLoggedInVendorId } from '../../../middlewares/checkVendorAuthorization';
 
 export const vendorServices = {
   createVendor,
   getVendor,
   getVendorById,
+  getVendorBySlug,
   getVendorByEmail,
+  updateVendor,
+  deleteVendor
 };
 
 // createVendor ---------------------
@@ -41,7 +47,21 @@ async function getVendor({ where }: GetVendorArgs) {
     where,
   });
 }
-
+async function updateVendor(vendor:UpdateVendor , vendorId :number) {  
+  
+  
+  return await prismaClient.vendor.update({where:{id:vendorId}, data:{
+    ...vendor
+  } } )
+   
+}
+async function deleteVendor(vendorId :number) {  
+ 
+  
+  return await prismaClient.vendor.delete({where:{id:vendorId}} )
+   
+}
+ 
 // getVendorByEmail ---------------------
 async function getVendorByEmail(email: string) {
   return await prismaClient.vendor.findUnique({
@@ -56,6 +76,14 @@ async function getVendorById(id: number) {
   return await prismaClient.vendor.findUnique({
     where: {
       id,
+    },
+  });
+}
+// getVendorBySlug ---------------------
+async function getVendorBySlug(vendorSlug: string) {
+  return await prismaClient.vendor.findUnique({
+    where: {
+      vendorSlug,
     },
   });
 }

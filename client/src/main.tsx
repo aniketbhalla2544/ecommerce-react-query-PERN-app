@@ -4,20 +4,22 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+
 import Root from './routes/Root';
 import VendorSignup from './routes/vendorSignup/VendorSignup';
 import VendorSignin from './routes/vendorSignin/VendorSignin';
 import DashboardPage from './routes/DashboardPage';
 import DashboardProducts from './components/dashboard/dashboardProducts/DashboardProducts';
+import DashboardVendorSettings from './components/dashboard/dashboardSettings/dashboardSettings';
 
 export const router = createBrowserRouter(
   [
     {
       path: '/register',
-      element: <VendorSignup />,
+      element: <VendorSignup />,      
     },
     {
-      path: '/signin',
+      path: '/sign-in',
       element: <VendorSignin />,
     },
     {
@@ -31,6 +33,10 @@ export const router = createBrowserRouter(
             {
               path: 'products',
               element: <DashboardProducts />,
+            },
+            {
+              path: 'settings',
+              element: <DashboardVendorSettings />,
             },
           ],
         },

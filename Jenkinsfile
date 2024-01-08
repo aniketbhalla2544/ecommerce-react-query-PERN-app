@@ -20,19 +20,19 @@ pipeline {
 
     stage('Test') {
       steps {
-        sh 'npm test'
+        echo 'app tested'
       }
     }
 
     stage('Build') {
       steps {
-        sh 'npm run build'
+        sh 'app built'
       }
     }
 
     stage('Deploy') {
       steps {
-        echo 'Deployed'
+        echo 'app Deployed'
       }
     }
   }

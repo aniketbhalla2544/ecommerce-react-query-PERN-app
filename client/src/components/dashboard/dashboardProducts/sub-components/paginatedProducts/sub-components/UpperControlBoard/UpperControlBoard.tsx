@@ -2,7 +2,7 @@ import React from 'react';
 import CreateProductModal from '../CreateProductModal';
 import ConditionalRender from '../../../../../../utils/ConditionalRender';
 import usePaginatedProductsContext from '../../hooks/usePaginatedProductsContext';
-import useAppStore from '../../../../../../../stores/zustand/appStore';
+import useAppStore from '../../../../../../../stores/zustand/zustand.store';
 import toast from 'react-hot-toast';
 import { logger } from '../../../../../../../utils/logger';
 import { deleteProduct } from '../../../../../../../api/products';

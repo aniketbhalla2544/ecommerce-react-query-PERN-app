@@ -1,7 +1,7 @@
 import { PiWarningLight } from 'react-icons/pi';
 import Modal from '../Modal';
 import Spinner from '../Spinner';
-import useAppStore from '../../../stores/zustand/appStore';
+import useAppStore from '../../../stores/zustand/zustand.store';
 
 const DeleteModal = () => {
   const { deleteModalState, onDeleteModalCancelBtnClick, onDeleteModalDeleteBtnClick } =

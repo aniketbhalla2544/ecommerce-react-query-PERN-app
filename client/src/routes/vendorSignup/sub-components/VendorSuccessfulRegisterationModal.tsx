@@ -1,7 +1,7 @@
 import Modal from '../../../components/utils/Modal';
 import clebImg from '../../../assets/celeberation-cone.gif';
 import { useNavigate } from 'react-router-dom';
-import appRoutes from '../../../utils/app.routes';
+import appRoutes from '../../../constants/app.routes';
 
 const CELEBERATION_IMG_SIZE = 150;
 

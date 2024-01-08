@@ -4,7 +4,7 @@ import useVendorSignin from './hooks/useVendorSignin';
 import IndeterminateProgressBar from '../../components/utils/IndeterminateProgressBar';
 import Input from '../../components/utils/Input';
 import Spinner from '../../components/utils/Spinner';
-import appRoutes from '../../utils/app.routes';
+import appRoutes from '@constants/app.routes';
 
 // TODO: add show password icon to password input
 
@@ -50,7 +50,7 @@ const VendorSignin = () => {
                 htmlFor='email'
                 isInputError={isEmailInputError}
                 errorMsg={emailInputErrorMsg}
-                placeholder='example@gmail.com 📧'
+                placeholder='example@gmail.com'
               />
               <div>
                 <Input
@@ -63,7 +63,7 @@ const VendorSignin = () => {
                   name='password'
                   isInputError={isPasswordInputError}
                   errorMsg={passwordInputErrorMsg}
-                  placeholder='your secret password 🫣'
+                  placeholder='your secret password'
                 />
               </div>
             </div>

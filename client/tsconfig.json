@@ -23,8 +23,11 @@
       "@hooks/*": ["hooks/*"],
       "@api/*": ["api/*"],
       "@stores/*": ["stores/*"],
-      "@types/*": ["types/*"],
-      "@utils/*": ["utils/*"]
+      "@utils/*": ["utils/*"],
+      "@react-router-dom/routes/*": ["routes/*"],
+      "@constants/*": ["constants/*"],
+      "@config/*": ["config/*"],
+      "@mock/*": ["mock/*"]
     }
   },
   "include": ["src/**/*", "vite.config.ts", ".vitest/**/*"],

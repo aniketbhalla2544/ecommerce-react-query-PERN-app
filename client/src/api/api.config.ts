@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import useAppStore from '../stores/zustand/appStore';
+import useAppStore from '../stores/zustand/zustand.store';
 import { logger } from '../utils/logger';
 import { resetAppState } from '../utils/auth.utils';
 import { isProductionEnv } from '../utils/utils';

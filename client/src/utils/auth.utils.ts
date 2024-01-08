@@ -1,6 +1,7 @@
-import appRoutes from './app.routes';
-import useAppStore from '../stores/zustand/appStore';
-import { queryClient, router } from '../main';
+import appRoutes from '../constants/app.routes';
+import useAppStore from '../stores/zustand/zustand.store';
+import { queryClient } from '../main';
+import { router } from '@config/routes.config';
 
 export function resetAppState() {
   useAppStore.getState().resetAppState();

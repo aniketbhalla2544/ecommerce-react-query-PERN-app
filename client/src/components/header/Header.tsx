@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import Container from '../utils/Container';
 import WebsiteIcon from '../utils/WebsiteIcon';
-import appRoutes from '../../utils/app.routes';
+import appRoutes from '../../constants/app.routes';
 import useAuth from '../../hooks/useAuth';
 import ConditionalRender from '../utils/ConditionalRender';
 import VendorProfile from './sub-components/VendorProfile';

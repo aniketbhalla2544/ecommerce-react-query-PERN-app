@@ -1,10 +1,10 @@
 import React from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import appRoutes from '../../../utils/app.routes';
+import appRoutes from '../../../constants/app.routes';
 import ConditionalRender from '../../utils/ConditionalRender';
 import useOnClickOutside from 'use-onclickoutside';
-import useAppStore from '../../../stores/zustand/appStore';
+import useAppStore from '../../../stores/zustand/zustand.store';
 import { signoutVendor } from '../../../api/auth';
 import { resetAppState } from '../../../utils/auth.utils';
 

@@ -1,17 +1,19 @@
 import React, { useEffect } from 'react';
 import toast from 'react-hot-toast';
-import useAppStore from '../../../../stores/zustand/appStore';
+import useAppStore from '../../../../stores/zustand/zustand.store';
 import { useForm } from 'react-hook-form';
 import { Vendor } from '../../../../types/vendor';
 import { AxiosError } from 'axios';
 import { resetAppState } from '../../../../utils/auth.utils';
 
-import { updatedSettingsState, vendorSettingsStateContextType } from './vendorSettingsContextTypes';
+import {
+  updatedSettingsState,
+  vendorSettingsStateContextType,
+} from './vendorSettingsContextTypes';
 import { deleteVendor, updateVendor } from '../../../../api/vendor';
 
-export const VendorSettingsContext = React.createContext<vendorSettingsStateContextType | null>(
-  null
-);
+export const VendorSettingsContext =
+  React.createContext<vendorSettingsStateContextType | null>(null);
 // provider for vendros setting page
 const VendorSettingsProvider = ({ children }: Record<'children', React.ReactNode>) => {
   // load vendor profile data from AppStore
@@ -48,7 +50,10 @@ const VendorSettingsProvider = ({ children }: Record<'children', React.ReactNode
       if (e instanceof AxiosError) {
         error = e.response?.data?.message;
         if (error.includes('slug already exists')) {
-          setError('vendorSlug', { type: 'custom', message: 'Vendor slug is not available' });
+          setError('vendorSlug', {
+            type: 'custom',
+            message: 'Vendor slug is not available',
+          });
         }
         if (error.includes('email already exists.')) {
           setError('email', { type: 'custom', message: 'Vendor email already exists.' });

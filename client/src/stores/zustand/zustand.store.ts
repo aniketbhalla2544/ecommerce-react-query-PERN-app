@@ -1,7 +1,7 @@
+import { isProductionEnv } from '@utils/utils';
+import { Vendor } from 'types/vendor';
 import { create } from 'zustand';
-import { Vendor } from '../../types/vendor';
 import { devtools, persist } from 'zustand/middleware';
-import { isProductionEnv } from '../../utils/utils';
 
 type DeleteModalState = {
   showModal: boolean;
@@ -10,13 +10,13 @@ type DeleteModalState = {
   contentText: string;
 };
 
-type State = {
+export type State = {
   vendor: Vendor;
   accessToken: string;
   deleteModalState: DeleteModalState;
 };
 
-type StateActions = {
+export type StateActions = {
   setVendor: (vendor: Vendor) => void;
   setAccessToken: (token: string) => void;
   resetAppState: VoidFunction;
@@ -31,12 +31,12 @@ type StateActions = {
   updateDeleteModalState: (state: Partial<DeleteModalState>) => void;
 };
 
-type AppState = State & StateActions;
+export type AppState = State & StateActions;
 
 const initialAppState: State = {
   accessToken: '',
   vendor: {
-    vendorId: '',
+    id: '',
     email: '',
     vendorSlug: '',
     fullname: '',

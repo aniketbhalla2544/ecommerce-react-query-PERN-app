@@ -1,16 +1,16 @@
 import React from 'react';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 import { getZodValidationIssues } from '../../../utils/errorHandlingUtils';
 import { logger } from '../../../utils/logger';
 import { isProductionEnv } from '../../../utils/utils';
 import { isAxiosError } from 'axios';
 import { UknownObject } from '../../../types/general';
-import { useNavigate } from 'react-router-dom';
 import vendorSigninFormZodValidationSchema from '../vendorSigninFormZodValidationSchema';
 import { signinVendor } from '../../../api/auth';
 import { getVendor } from '../../../api/vendor';
-import useAppStore from '../../../stores/zustand/appStore';
-import appRoutes from '../../../utils/app.routes';
+import useAppStore from '../../../stores/zustand/zustand.store';
+import appRoutes from '../../../constants/app.routes';
 
 type FormStateFields = {
   email: string;
@@ -158,17 +158,12 @@ const useVendorSignin = () => {
 
   React.useEffect(() => {
     if (accessToken && vendorId) {
+      logger.log('being redirected to proudcts page as user was already loggin in');
       navigate(appRoutes.dashboard.PRODUCTS, {
         replace: true,
       });
     }
   }, [accessToken, vendorId, navigate]);
-
-  // React.useEffect(() => {
-  //   console.log({
-  //     errors,
-  //   });
-  // }, [errors]);
 
   return {
     validationState: {

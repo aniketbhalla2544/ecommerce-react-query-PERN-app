@@ -6,7 +6,7 @@ import Spinner from '../../components/utils/Spinner';
 import IndeterminateProgressBar from '../../components/utils/IndeterminateProgressBar';
 import { Link } from 'react-router-dom';
 import VendorSuccessfulRegisterationModal from './sub-components/VendorSuccessfulRegisterationModal';
-import appRoutes from '../../utils/app.routes';
+import appRoutes from '../../constants/app.routes';
 
 // TODO: add show password icon to password input
 

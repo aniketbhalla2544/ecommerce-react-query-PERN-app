@@ -1,6 +1,4 @@
 export type Vendor = {
-  id: string;
-  vendorSlug: string;
   email: string;
   fullname: string;
   isPremium: boolean;

@@ -26,7 +26,7 @@ pipeline {
 
     stage('Build') {
       steps {
-        sh 'app built'
+        echo 'app built'
       }
     }
 

@@ -20,7 +20,7 @@ pipeline {
 
     stage('Test') {
       steps {
-        echo 'app has been tested'
+        echo 'app has been tested successfully'
       }
     }
 

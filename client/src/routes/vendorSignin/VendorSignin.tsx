@@ -26,8 +26,6 @@ const VendorSignin = () => {
     handleFormSubmit,
   } = useVendorSignin();
 
-  console.log('delete this log');
-
   return (
     <div className='min-h-screen flex-center bg-gray-100 py-12'>
       <div className='min-w-[450px] max-w-[500px] bg-white shadow-md rounded-xl overflow-hidden'>

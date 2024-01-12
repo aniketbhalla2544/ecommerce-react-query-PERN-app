@@ -1,0 +1,43 @@
+
+# --------------------- builder stage ------------------------------
+FROM node:16-alpine AS build
+
+# setting up working directory
+WORKDIR /app
+
+# copying package*.json file and installing node modules
+COPY package*.json ./
+RUN npm ci
+
+COPY tsconfig.json ./
+COPY tools ./tools
+COPY src ./src
+
+RUN npm run prisma:generate:prod
+
+RUN npm run build
+
+# Pruning development dependencies
+RUN npm prune --production
+
+
+
+#  --------------------- release stage ------------------------------
+FROM node:16-alpine AS release
+
+WORKDIR /app
+
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/package*.json ./
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/tools/prisma ./prisma
+
+# mapping container service to external port on host
+EXPOSE 3000
+
+ENV TZ=UTC
+ENV NODE_ENV=production
+ENV PORT=3004
+
+# starting docker container
+CMD ["npm", "run", "start:prod"]

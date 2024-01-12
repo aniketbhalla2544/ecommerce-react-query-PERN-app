@@ -5,12 +5,14 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "set NODE_ENV=development&& nodemon",
+    "start:prod": "node dist/src/server.js",
     "start": "set NODE_ENV=production&& node -r tsconfig-paths/register dist/server.js",
     "lint": "eslint . --ext .ts",
     "build": "tsc",
-    "prisma:generate": "prisma generate --schema=./tools/prisma/schema.prisma",
+    "prisma:migrate": "prisma migrate deploy",
+    "prisma:migrate:dev": "prisma migrate dev",
     "prisma:migration-status": "cd tools&& prisma migrate status",
-    "local-start": "node dist/src/server.js",
+    "prisma:generate:prod": "prisma generate --schema=./tools/prisma/schema.prisma",
     "test": "echo \"Error: no test specified\"&& exit 1"
   },
   "author": "Aniket Bhalla",

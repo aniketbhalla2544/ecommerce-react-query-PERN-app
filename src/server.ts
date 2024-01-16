@@ -32,7 +32,7 @@ cloudinary.config(appConfig.cloudinary);
 // routes
 app.get('/', async (req, res) => {
   return res.json({
-    msg: 'Vendor server running from docker jenkins',
+    msg: 'Vendor server running from ubuntu',
   });
 });
 

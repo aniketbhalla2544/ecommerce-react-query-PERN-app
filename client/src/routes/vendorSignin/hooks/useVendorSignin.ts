@@ -1,23 +1,23 @@
 import React from 'react';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import { getZodValidationIssues } from '../../../utils/errorHandlingUtils';
 import { logger } from '../../../utils/logger';
 import { isProductionEnv } from '../../../utils/utils';
 import { isAxiosError } from 'axios';
 import { UknownObject } from '../../../types/general';
 import vendorSigninFormZodValidationSchema from '../vendorSigninFormZodValidationSchema';
-import { signinVendor } from '../../../api/auth';
-import { getVendor } from '../../../api/vendor';
-import useAppStore from '../../../stores/zustand/zustand.store';
-import appRoutes from '../../../constants/app.routes';
+// import { signinVendor } from '../../../api/auth';
+// import { getVendor } from '../../../api/vendor';
+// import useAppStore from '../../../stores/zustand/zustand.store';
+// import appRoutes from '../../../constants/app.routes';
 
 type FormStateFields = {
   email: string;
   password: string;
 };
 
-type FormState = FormStateFields & {
+export type FormState = FormStateFields & {
   signinStatus: 'idle' | 'loading' | 'success' | 'error';
   errors: null | Partial<FormStateFields> | UknownObject;
 };
@@ -29,17 +29,28 @@ const initialFormState: FormState = {
   errors: null,
 };
 
+/**
+ * [Form state's error Object]
+ * errors object should be set to null in case of no errors, also means
+ * that it should contain no property but still should be null.
+ */
+
 const useVendorSignin = () => {
-  const { accessToken, setAccessToken, vendor, setVendor } = useAppStore((state) => ({
-    vendor: state.vendor,
-    setVendor: state.setVendor,
-    accessToken: state.accessToken,
-    setAccessToken: state.setAccessToken,
-  }));
-  const vendorId = vendor.id;
-  const navigate = useNavigate();
+  // const { accessToken, setAccessToken, vendor, setVendor } = useAppStore((state) => ({
+  //   vendor: state.vendor,
+  //   setVendor: state.setVendor,
+  //   accessToken: state.accessToken,
+  //   setAccessToken: state.setAccessToken,
+  // }));
+  // const vendorId = vendor.id;
+
+  // !! mock values
+  // const vendorId = 2;
+  // const accessToken = 'asdasd';
+
+  // const navigate = useNavigate();
   const [formState, setFormState] = React.useState<FormState>(initialFormState);
-  const { email, password, errors, signinStatus } = formState;
+  const { errors, signinStatus } = formState;
   const haveErrors = !!errors;
   const _errors = errors ?? {};
   const isEmailInputError = 'email' in _errors;
@@ -112,15 +123,15 @@ const useVendorSignin = () => {
     try {
       const validatedFormValues = await validateForm();
       if (!validatedFormValues) return;
-      const { email, password } = validatedFormValues;
+      // const { email, password } = validatedFormValues;
       updateSigninStatus('loading');
-      const { loginAccessToken } = await signinVendor({
-        email,
-        password,
-      });
-      setAccessToken(loginAccessToken); // in zustand app store
-      const vendor = await getVendor();
-      setVendor(vendor); // in zustand app store
+      // const { loginAccessToken } = await signinVendor({
+      //   email,
+      //   password,
+      // });
+      // setAccessToken(loginAccessToken); // in zustand app store
+      // const vendor = await getVendor();
+      // setVendor(vendor); // in zustand app store
       updateSigninStatus('success');
       toast.success('Vendor loggedin successfully 🫣');
     } catch (error) {
@@ -156,33 +167,32 @@ const useVendorSignin = () => {
     }
   };
 
-  React.useEffect(() => {
-    if (accessToken && vendorId) {
-      logger.log('being redirected to proudcts page as user was already loggin in');
-      navigate(appRoutes.dashboard.PRODUCTS, {
-        replace: true,
-      });
-    }
-  }, [accessToken, vendorId, navigate]);
+  // React.useEffect(() => {
+  //   if (accessToken && vendorId) {
+  //     logger.log('being redirected to proudcts page as user was already loggin in');
+  //     navigate(appRoutes.dashboard.PRODUCTS, {
+  //       replace: true,
+  //     });
+  //   }
+  // }, [accessToken, vendorId, navigate]);
 
   return {
-    validationState: {
-      haveErrors,
-      isEmailInputError,
-      emailInputErrorMsg,
-      isPasswordInputError,
-      passwordInputErrorMsg,
-      isFormSubmitBtnDisabled,
-      allFormControlsDisabled,
-      isSigninStatusLoading,
-      invalidCredentialsError,
+    validationStates: {
+      haveErrors, // ✅
+      isEmailInputError, // ✅
+      emailInputErrorMsg, // ✅
+      isPasswordInputError, // ✅
+      passwordInputErrorMsg, // ✅
+      isSigninStatusLoading, // ✅
+      allFormControlsDisabled, // ✅
+      isFormSubmitBtnDisabled, // ✅
+      invalidCredentialsError, // ✅
     },
-    formState: {
-      email,
-      password,
-      errors,
-      enterTestValues,
+    form: {
+      updateFormState, // ✅
     },
+    formState, // ✅
+    enterTestValues,
     isDefaultValuesBtnVisible,
     handleFormValues,
     handleFormSubmit,

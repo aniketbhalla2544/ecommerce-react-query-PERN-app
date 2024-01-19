@@ -10,7 +10,7 @@ import appRoutes from '@constants/app.routes';
 
 const VendorSignin = () => {
   const {
-    validationState: {
+    validationStates: {
       isEmailInputError,
       emailInputErrorMsg,
       isPasswordInputError,
@@ -20,7 +20,8 @@ const VendorSignin = () => {
       isSigninStatusLoading,
       invalidCredentialsError,
     },
-    formState: { email, password, enterTestValues },
+    formState,
+    enterTestValues,
     isDefaultValuesBtnVisible,
     handleFormValues,
     handleFormSubmit,
@@ -41,29 +42,29 @@ const VendorSignin = () => {
             {/* ----------- form controls */}
             <div className='flex flex-col gap-y-8 py-10'>
               <Input
+                autoFocus
+                type='email'
                 disabled={allFormControlsDisabled}
                 onChange={handleFormValues}
-                value={email}
-                type='email'
+                value={formState.email}
                 labelText='Email'
                 name='email'
                 htmlFor='email'
                 isInputError={isEmailInputError}
                 errorMsg={emailInputErrorMsg}
-                placeholder='example@gmail.com'
+                placeholder='username@example.com'
               />
               <div>
                 <Input
                   type='password'
                   disabled={allFormControlsDisabled}
                   onChange={handleFormValues}
-                  value={password}
+                  value={formState.password}
                   labelText='Password'
                   htmlFor='password'
                   name='password'
                   isInputError={isPasswordInputError}
                   errorMsg={passwordInputErrorMsg}
-                  placeholder='your secret password'
                 />
               </div>
             </div>
@@ -89,7 +90,7 @@ const VendorSignin = () => {
             </div>
           </form>
           <p className='text-center text-sm mt-4'>
-            Don't have an account?<span> </span>
+            <span>Don't have an account?</span>&nbsp;
             <Link to={appRoutes.REGISTER} className='app-link'>
               Create Account
             </Link>
@@ -112,7 +113,10 @@ type FormErrorMsgProps = {
 const FormErrorMsg = ({ isVisible, children }: FormErrorMsgProps) => {
   if (!isVisible) return <></>;
   return (
-    <div className='flex items-center gap-x-2 mt-6 text-red-500 bg-red-200 text-xs px-4 py-2 rounded-lg'>
+    <div
+      className='flex items-center gap-x-2 mt-6 text-red-500 bg-red-200 text-xs px-4 py-2 rounded-lg'
+      role='alert'
+    >
       <p className='text-lg'>
         <PiWarningLight />
       </p>

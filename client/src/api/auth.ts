@@ -7,9 +7,13 @@ type SigninVendorResponse = {
   loginAccessToken: string;
 };
 
+export const authRoutes = {
+  SIGN_IN: '/auth/signin',
+};
+
 export const signinVendor = async (registerVendor: SigninVendor) => {
   const { email, password } = registerVendor;
-  const { data } = await apiClient.post<SigninVendorResponse>('/auth/signin', null, {
+  const { data } = await apiClient.post<SigninVendorResponse>(authRoutes.SIGN_IN, null, {
     auth: {
       username: email,
       password,

@@ -1,16 +1,15 @@
+import { screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import VendorSignin from '@react-router-dom/routes/vendorSignin/VendorSignin';
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { renderWithRouter } from '@utils/tests/renderWithMemoryRouter';
+// import { MemoryRouter } from 'react-router-dom';
 
 describe('Vendor Sign-in Form', () => {
   // rendering the sign-in form page with route context before each test runs
   beforeEach(() => {
-    render(
-      <MemoryRouter initialEntries={['/sign-in']}>
-        <VendorSignin />
-      </MemoryRouter>
-    );
+    renderWithRouter(<VendorSignin />, {
+      route: '/sign-in',
+    });
   });
 
   test('should have correct visible form heading', () => {
@@ -96,8 +95,8 @@ describe('Vendor Sign-in Form', () => {
     });
   });
 
-  describe('validations', () => {
-    test('form submittions', async () => {
+  describe('form submittions', () => {
+    test('should be successful in case of positive response from backend', async () => {
       const user = userEvent.setup();
 
       const emailInput = screen.getByLabelText(/email/i);
@@ -110,7 +109,7 @@ describe('Vendor Sign-in Form', () => {
       await user.type(emailInput, 'sadfsadf@s');
       await user.type(passwordInput, 'asdf');
 
-      await user.click(signinButton);
+      await act(async () => await user.click(signinButton));
 
       /**
        * upon clicking sign-in button with invalid credentials,

@@ -74,11 +74,8 @@ describe('Vendor sign-in custom hook', () => {
       });
 
       test('should be true when form state have errors object', () => {
-        const { result } = renderHook(() => useVendorSignin());
-
-        // setting errors
-        act(() =>
-          result.current.form.updateFormState({
+        const { result } = renderHook(() =>
+          useVendorSignin({
             errors: {
               email: 'invalid email',
               password: 'incorrect password',
@@ -98,10 +95,8 @@ describe('Vendor sign-in custom hook', () => {
       });
 
       test('should be true when email input error', () => {
-        const { result } = renderHook(() => useVendorSignin());
-
-        act(() =>
-          result.current.form.updateFormState({
+        const { result } = renderHook(() =>
+          useVendorSignin({
             errors: {
               email: 'incorrect email',
             },
@@ -111,10 +106,8 @@ describe('Vendor sign-in custom hook', () => {
         expect(result.current.validationStates.isEmailInputError).toBeTruthy();
       });
       test('should be false when is form error but not email input error', () => {
-        const { result } = renderHook(() => useVendorSignin());
-
-        act(() =>
-          result.current.form.updateFormState({
+        const { result } = renderHook(() =>
+          useVendorSignin({
             errors: {
               password: 'sdafsadf',
             },
@@ -132,10 +125,9 @@ describe('Vendor sign-in custom hook', () => {
       });
 
       test("should have msg set by error object's email prop", () => {
-        const { result } = renderHook(() => useVendorSignin());
         const errorMsg = 'incorrect email';
-        act(() =>
-          result.current.form.updateFormState({
+        const { result } = renderHook(() =>
+          useVendorSignin({
             errors: {
               email: errorMsg,
             },
@@ -144,9 +136,8 @@ describe('Vendor sign-in custom hook', () => {
         expect(result.current.validationStates.emailInputErrorMsg).toBe(errorMsg);
       });
       test('should be empty string when is form error but not email input error', () => {
-        const { result } = renderHook(() => useVendorSignin());
-        act(() =>
-          result.current.form.updateFormState({
+        const { result } = renderHook(() =>
+          useVendorSignin({
             errors: {
               password: 'incorrect password',
             },
@@ -163,10 +154,8 @@ describe('Vendor sign-in custom hook', () => {
       });
 
       test('should be true when password input error', () => {
-        const { result } = renderHook(() => useVendorSignin());
-
-        act(() =>
-          result.current.form.updateFormState({
+        const { result } = renderHook(() =>
+          useVendorSignin({
             errors: {
               password: 'incorrect password',
             },
@@ -176,10 +165,8 @@ describe('Vendor sign-in custom hook', () => {
         expect(result.current.validationStates.isPasswordInputError).toBeTruthy();
       });
       test('should be false when is form error but not password input error', () => {
-        const { result } = renderHook(() => useVendorSignin());
-
-        act(() =>
-          result.current.form.updateFormState({
+        const { result } = renderHook(() =>
+          useVendorSignin({
             errors: {
               email: 'incorrect email',
             },
@@ -197,10 +184,9 @@ describe('Vendor sign-in custom hook', () => {
       });
 
       test("should have msg set by error object's password prop", () => {
-        const { result } = renderHook(() => useVendorSignin());
         const errorMsg = 'incorrect password';
-        act(() =>
-          result.current.form.updateFormState({
+        const { result } = renderHook(() =>
+          useVendorSignin({
             errors: {
               password: errorMsg,
             },
@@ -209,9 +195,8 @@ describe('Vendor sign-in custom hook', () => {
         expect(result.current.validationStates.passwordInputErrorMsg).toBe(errorMsg);
       });
       test('should be empty string when is form error but not password input error', () => {
-        const { result } = renderHook(() => useVendorSignin());
-        act(() =>
-          result.current.form.updateFormState({
+        const { result } = renderHook(() =>
+          useVendorSignin({
             errors: {
               email: 'incorrect email',
             },
@@ -230,9 +215,8 @@ describe('Vendor sign-in custom hook', () => {
       });
 
       test("should be true when signinStatus is 'loading'", () => {
-        const { result } = renderHook(() => useVendorSignin());
-        act(() =>
-          result.current.form.updateFormState({
+        const { result } = renderHook(() =>
+          useVendorSignin({
             signinStatus: 'loading',
           })
         );
@@ -246,9 +230,8 @@ describe('Vendor sign-in custom hook', () => {
       });
 
       test("should be true when signinStatus is 'loading'", () => {
-        const { result } = renderHook(() => useVendorSignin());
-        act(() =>
-          result.current.form.updateFormState({
+        const { result } = renderHook(() =>
+          useVendorSignin({
             signinStatus: 'loading',
           })
         );
@@ -262,12 +245,12 @@ describe('Vendor sign-in custom hook', () => {
       });
 
       test("should be true when signinStatus is 'loading'", () => {
-        const { result } = renderHook(() => useVendorSignin());
-        act(() =>
-          result.current.form.updateFormState({
+        const { result } = renderHook(() =>
+          useVendorSignin({
             signinStatus: 'loading',
           })
         );
+        expect(result.current.validationStates.isFormSubmitBtnDisabled).toBeTruthy();
         expect(result.current.validationStates.isFormSubmitBtnDisabled).toBeTruthy();
       });
     });
@@ -278,9 +261,8 @@ describe('Vendor sign-in custom hook', () => {
       });
 
       test('should be true when invalidCredentials prop in errors object', () => {
-        const { result } = renderHook(() => useVendorSignin());
-        act(() =>
-          result.current.form.updateFormState({
+        const { result } = renderHook(() =>
+          useVendorSignin({
             errors: {
               invalidCredentials: true,
             },
@@ -291,5 +273,89 @@ describe('Vendor sign-in custom hook', () => {
     });
   });
 
-  describe('validateForm()', () => {});
+  describe('validateForm():', () => {
+    test("should reset errors object to null upon it's call with valid user credentials", async () => {
+      const validFormState = {
+        email: 'username@gmail.com',
+        password: 'sadf234AS@@&&adsf123',
+      };
+
+      const { result } = renderHook(() =>
+        useVendorSignin({
+          email: validFormState.email,
+          password: validFormState.password,
+          errors: {
+            email: 'invalid email',
+            password: 'incorrect password',
+          },
+        })
+      );
+
+      const validatedData = await act(async () => result.current.form.validateForm());
+      expect(validatedData).toEqual(validFormState);
+      expect(result.current.formState.errors).toBeNull();
+    });
+
+    test('should return valid form state credentials with no errors', async () => {
+      const validUserCredentials = {
+        email: 'username@gmail.com',
+        password: '123',
+      };
+      const { result } = renderHook(() =>
+        useVendorSignin({
+          email: validUserCredentials.email,
+          password: validUserCredentials.password,
+        })
+      );
+
+      const validatedCredentials = await act(async () =>
+        result.current.form.validateForm()
+      );
+      expect(validatedCredentials).not.toBe(undefined);
+      expect(validatedCredentials).toStrictEqual(validUserCredentials);
+      expect(result.current.formState.errors).toBeNull();
+    });
+
+    test('should throw error for invalid email in form state credentials with invalidCredentials prop in error object', async () => {
+      const { result } = renderHook(() =>
+        useVendorSignin({
+          email: 'usernam',
+          password: '123asdf',
+        })
+      );
+      try {
+        await act(async () => result.current.form.validateForm());
+        expect.fail('validateForm should have thrown error for invalid email');
+      } catch (error) {
+        expect(result.current.formState.errors).toHaveProperty(
+          'invalidCredentials',
+          true
+        );
+      }
+    });
+
+    test('should throw error for invalid password in form state credentials with invalidCredentials prop in error object', async () => {
+      const { result } = renderHook(() =>
+        useVendorSignin({
+          email: 'username@gmail.com',
+          password: '',
+        })
+      );
+      try {
+        await act(async () => result.current.form.validateForm());
+        expect.fail('validateForm should have thrown error for invalid password');
+      } catch (error) {
+        expect(result.current.formState.errors).toHaveProperty(
+          'invalidCredentials',
+          true
+        );
+      }
+    });
+  });
+
+  test('updateSigninStatus should change signin status to error', () => {
+    const { result } = renderHook(() => useVendorSignin());
+    act(() => result.current.form.updateSigninStatus('error'));
+    expect(result.current.formState.signinStatus).toBe('error');
+  });
 });

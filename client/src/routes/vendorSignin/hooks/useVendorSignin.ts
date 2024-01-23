@@ -7,7 +7,7 @@ import { isProductionEnv } from '../../../utils/utils';
 import { isAxiosError } from 'axios';
 import { UknownObject } from '../../../types/general';
 import vendorSigninFormZodValidationSchema from '../vendorSigninFormZodValidationSchema';
-// import { signinVendor } from '../../../api/auth';
+import { signinVendor } from '@api/auth';
 // import { getVendor } from '../../../api/vendor';
 // import useAppStore from '../../../stores/zustand/zustand.store';
 // import appRoutes from '../../../constants/app.routes';
@@ -22,7 +22,7 @@ export type FormState = FormStateFields & {
   errors: null | Partial<FormStateFields> | UknownObject;
 };
 
-const initialFormState: FormState = {
+const defaultInitialFormState: FormState = {
   signinStatus: 'idle',
   email: '',
   password: '',
@@ -35,7 +35,9 @@ const initialFormState: FormState = {
  * that it should contain no property but still should be null.
  */
 
-const useVendorSignin = () => {
+const useVendorSignin = <T extends Partial<FormState>>(
+  initialFormState: T = <T>defaultInitialFormState
+) => {
   // const { accessToken, setAccessToken, vendor, setVendor } = useAppStore((state) => ({
   //   vendor: state.vendor,
   //   setVendor: state.setVendor,
@@ -49,7 +51,12 @@ const useVendorSignin = () => {
   // const accessToken = 'asdasd';
 
   // const navigate = useNavigate();
-  const [formState, setFormState] = React.useState<FormState>(initialFormState);
+  const [formState, setFormState] = React.useState<FormState>(() => {
+    return {
+      ...defaultInitialFormState,
+      ...initialFormState,
+    };
+  });
   const { errors, signinStatus } = formState;
   const haveErrors = !!errors;
   const _errors = errors ?? {};
@@ -92,6 +99,7 @@ const useVendorSignin = () => {
     }));
   };
 
+  // ✅
   const validateForm = async () => {
     try {
       if (errors) {
@@ -107,7 +115,7 @@ const useVendorSignin = () => {
       toast.error('Unable to sign in 🫢');
       const issues = getZodValidationIssues(error);
       if (issues) {
-        logger.log('Invalid type credentials, zod validation issues: ', issues);
+        // logger.log('Invalid type credentials, zod validation issues: ', issues);
         updateFormState({
           password: '',
           errors: {
@@ -123,12 +131,13 @@ const useVendorSignin = () => {
     try {
       const validatedFormValues = await validateForm();
       if (!validatedFormValues) return;
-      // const { email, password } = validatedFormValues;
+      const { email, password } = validatedFormValues;
       updateSigninStatus('loading');
-      // const { loginAccessToken } = await signinVendor({
-      //   email,
-      //   password,
-      // });
+      const { loginAccessToken } = await signinVendor({
+        email,
+        password,
+      });
+      console.log('loginAccessToken: ', loginAccessToken);
       // setAccessToken(loginAccessToken); // in zustand app store
       // const vendor = await getVendor();
       // setVendor(vendor); // in zustand app store
@@ -190,6 +199,8 @@ const useVendorSignin = () => {
     },
     form: {
       updateFormState, // ✅
+      validateForm, // ✅
+      updateSigninStatus,
     },
     formState, // ✅
     enterTestValues,

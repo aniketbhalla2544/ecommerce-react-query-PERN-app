@@ -1,16 +1,23 @@
 import React from 'react';
 import toast from 'react-hot-toast';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { getZodValidationIssues } from '../../../utils/errorHandlingUtils';
 import { logger } from '../../../utils/logger';
 import { isProductionEnv } from '../../../utils/utils';
 import { isAxiosError } from 'axios';
 import { UknownObject } from '../../../types/general';
 import vendorSigninFormZodValidationSchema from '../vendorSigninFormZodValidationSchema';
+<<<<<<< Updated upstream
 import { signinVendor } from '@api/auth';
 // import { getVendor } from '../../../api/vendor';
 // import useAppStore from '../../../stores/zustand/zustand.store';
 // import appRoutes from '../../../constants/app.routes';
+=======
+import { signinVendor } from '../../../api/auth';
+import { getVendor } from '../../../api/vendor';
+import useAppStore from '../../../stores/zustand/zustand.store';
+import appRoutes from '../../../constants/app.routes';
+>>>>>>> Stashed changes
 
 type FormStateFields = {
   email: string;
@@ -35,6 +42,7 @@ const defaultInitialFormState: FormState = {
  * that it should contain no property but still should be null.
  */
 
+<<<<<<< Updated upstream
 const useVendorSignin = <T extends Partial<FormState>>(
   initialFormState: T = <T>defaultInitialFormState
 ) => {
@@ -45,11 +53,22 @@ const useVendorSignin = <T extends Partial<FormState>>(
   //   setAccessToken: state.setAccessToken,
   // }));
   // const vendorId = vendor.id;
+=======
+const useVendorSignin = () => {
+  const { accessToken, setAccessToken, vendor, setVendor } = useAppStore((state) => ({
+    vendor: state.vendor,
+    setVendor: state.setVendor,
+    accessToken: state.accessToken,
+    setAccessToken: state.setAccessToken,
+  }));
+  const vendorId = vendor.id;
+>>>>>>> Stashed changes
 
   // !! mock values
   // const vendorId = 2;
   // const accessToken = 'asdasd';
 
+<<<<<<< Updated upstream
   // const navigate = useNavigate();
   const [formState, setFormState] = React.useState<FormState>(() => {
     return {
@@ -57,6 +76,10 @@ const useVendorSignin = <T extends Partial<FormState>>(
       ...initialFormState,
     };
   });
+=======
+  const navigate = useNavigate();
+  const [formState, setFormState] = React.useState<FormState>(initialFormState);
+>>>>>>> Stashed changes
   const { errors, signinStatus } = formState;
   const haveErrors = !!errors;
   const _errors = errors ?? {};
@@ -137,10 +160,16 @@ const useVendorSignin = <T extends Partial<FormState>>(
         email,
         password,
       });
+<<<<<<< Updated upstream
       console.log('loginAccessToken: ', loginAccessToken);
       // setAccessToken(loginAccessToken); // in zustand app store
       // const vendor = await getVendor();
       // setVendor(vendor); // in zustand app store
+=======
+      setAccessToken(loginAccessToken); // in zustand app store
+      const vendor = await getVendor();
+      setVendor(vendor); // in zustand app store
+>>>>>>> Stashed changes
       updateSigninStatus('success');
       toast.success('Vendor loggedin successfully 🫣');
     } catch (error) {
@@ -176,14 +205,14 @@ const useVendorSignin = <T extends Partial<FormState>>(
     }
   };
 
-  // React.useEffect(() => {
-  //   if (accessToken && vendorId) {
-  //     logger.log('being redirected to proudcts page as user was already loggin in');
-  //     navigate(appRoutes.dashboard.PRODUCTS, {
-  //       replace: true,
-  //     });
-  //   }
-  // }, [accessToken, vendorId, navigate]);
+  React.useEffect(() => {
+    if (accessToken && vendorId) {
+      logger.log('being redirected to proudcts page as user was already loggin in');
+      navigate(appRoutes.dashboard.PRODUCTS, {
+        replace: true,
+      });
+    }
+  }, [accessToken, vendorId, navigate]);
 
   return {
     validationStates: {

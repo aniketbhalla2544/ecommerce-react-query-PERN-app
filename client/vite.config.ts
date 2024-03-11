@@ -2,7 +2,7 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vitest/config';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
-const SERVER_PORT = 3004;
+const SERVER_PORT = 3005;
 
 // https://vitejs.dev/config/
 export default defineConfig({

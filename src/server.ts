@@ -12,7 +12,7 @@ import appRouter from './app.router';
 import appConfig from './config/appConfig';
 
 const env = process.env;
-const PORT = env.PORT || 3004;
+const PORT = env.PORT || 3005;
 const app = express();
 
 // app middlewares

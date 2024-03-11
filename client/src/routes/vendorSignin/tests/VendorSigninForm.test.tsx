@@ -121,6 +121,7 @@ describe('Vendor Sign-in Form', () => {
 
       expect(errorAlert).toContainElement(invalidCredentialsErrorMsg);
       expect(invalidCredentialsErrorMsg).toBeVisible();
+      expect(invalidCredentialsErrorMsg).toBeVisible();
     });
   });
 });

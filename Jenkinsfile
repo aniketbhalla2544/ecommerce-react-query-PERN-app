@@ -10,6 +10,7 @@ pipeline {
     stage('Build') {
       steps {
         echo "docker images built"
+        
       }
     }
 

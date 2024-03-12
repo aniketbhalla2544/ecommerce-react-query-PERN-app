@@ -16,7 +16,7 @@ pipeline {
 
     stage('Deploy') {
       steps {
-        echo 'app Deployed'
+        echo 'app Deployed after build process.'
       }
     }
   }

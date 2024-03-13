@@ -36,6 +36,7 @@ const VendorSignin = () => {
         <p>delete this</p>
         <p>delete this</p>
         <p>delete this aniket</p>
+        <p>delete this aniket bhalla</p>
 
         <div className='px-8 py-12'>
           <form onSubmit={handleFormSubmit}>

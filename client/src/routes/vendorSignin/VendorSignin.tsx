@@ -31,7 +31,8 @@ const VendorSignin = () => {
     <div className='min-h-screen flex-center bg-gray-100 py-12'>
       <div className='min-w-[450px] max-w-[500px] bg-white shadow-md rounded-xl overflow-hidden'>
         <IndeterminateProgressBar isVisible={isSigninStatusLoading} />
-        <p>Hi there </p> 
+        <p>delete this</p>
+        <p>delete this</p>
         <div className='px-8 py-12'>
           <form onSubmit={handleFormSubmit}>
             <h2 className='text-lg font-semibold'>Vendor Sign In</h2>

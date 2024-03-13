@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 pipeline {
-  agent { label 'master' }
+  agent any
 
   tools {
     nodejs 'nodejs21'

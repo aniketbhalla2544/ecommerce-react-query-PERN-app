@@ -13,7 +13,7 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        echo "building docker images"
+        echo "building docker images, now happening"
         // sh 'docker build -f Dockerfile.production-server -t aniketbhalla/vendor-dashboard-server .'
       }
     }

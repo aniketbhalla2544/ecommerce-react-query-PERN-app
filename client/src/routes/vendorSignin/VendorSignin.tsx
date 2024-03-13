@@ -33,6 +33,7 @@ const VendorSignin = () => {
         <IndeterminateProgressBar isVisible={isSigninStatusLoading} />
         <p>delete this</p>
         <p>delete this</p>
+        <p>delete this</p>
         <div className='px-8 py-12'>
           <form onSubmit={handleFormSubmit}>
             <h2 className='text-lg font-semibold'>Vendor Sign In</h2>

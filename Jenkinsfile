@@ -8,27 +8,23 @@ pipeline {
   }
 
   stages {
-    stage('Install Dependencies') {
-        steps {
-            sh "npm install"
-          }
-      }
-
-
+    stage('clean workspace'){
+            steps{
+                cleanWs()
+            }
+    }
     stage('Build') {
       steps {
         echo "building docker images, now happening"
         // sh 'docker build -f Dockerfile.production-server -t aniketbhalla/vendor-dashboard-server .'
       }
     }
-
     stage('Deploy') {
       steps {
         echo 'app Deployed after build process after.'
       }
     }
   }
-
   post {
     always {
       echo 'The build is completed! Sent notification to Slack.'

@@ -7,11 +7,6 @@ pipeline {
   }
 
   stages {
-    stage('clean workspace'){
-            steps{
-                cleanWs()
-            }
-    }
     stage('Build') {
       steps {
         echo "building docker images, now happening"

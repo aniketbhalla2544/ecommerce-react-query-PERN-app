@@ -7,10 +7,14 @@ pipeline {
     nodejs 'nodejs21'
   }
 
-  environment {
-  }
-
   stages {
+    stage('Install Dependencies') {
+        steps {
+            sh "npm install"
+          }
+      }
+
+
     stage('Build') {
       steps {
         echo "building docker images, now happening"
